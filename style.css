@@ -3,289 +3,145 @@ body {
     font-family: sans-serif;
     margin: 15px; /* Add some overall margin */
     background-color: #f0f2f5; /* Light background for body */
-   }
+}
 
-
-
-
-   /* --- Phase 2: UI Elements --- */
-   #header-container {
-    padding: 8px 15px; /* Adjusted padding */
+/* --- Header --- */
+#header-container {
+    padding: 8px 15px;
     border-bottom: 1px solid #ccc;
-    background-color: #ffffff; /* White header */
+    background-color: #ffffff;
     min-height: 40px;
-    display: flex; /* Use flex for alignment */
-    align-items: center; /* Vertically align items */
-    justify-content: space-between; /* Space out items */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     border-radius: 6px;
     margin-bottom: 15px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-   }
+}
 
-   .header-content { /* No longer needed directly on header */
-       display: flex;
-       align-items: center;
-       justify-content: space-between; /* Ensure space between groups */
-       width: 100%;
-   }
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
 
-   /* Container for Model Selector - Centered */
-   .model-selector-container {
-       display: flex;
-       align-items: center;
-       flex-grow: 1; /* Allow it to take space */
-       justify-content: center; /* Center label and select */
-       margin: 0 20px; /* Add margin to avoid collision */
-   }
+/* Model Selector Styling */
+.model-selector-container {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: center;
+    margin: 0 20px;
+}
 
-   .model-selector-container label { /* Label is removed, but keeping style just in case */
-       margin-right: 8px;
-       color: #555;
-       font-size: 0.9em;
-       white-space: nowrap;
-   }
-
-   #model-selector {
-       /* Improved dropdown appearance */
-       padding: 6px 10px;
-       border: 1px solid #ccc;
-       border-radius: 4px;
-       background-color: #fff;
-       font-size: 0.9em;
-       min-width: 200px; /* Give it some base width */
-       max-width: 350px; /* Prevent it getting too wide */
-       cursor: pointer;
-       /* Add some basic styling, hiding native arrow is complex */
-   }
-   #model-selector:focus {
-       outline: none;
-       border-color: #007bff;
-       box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-   }
-
-   /* Container for User Info */
-   .user-info-container {
-       display: flex;
-       flex-direction: column; /* Stack username and button */
-       align-items: flex-end; /* Align to the right */
-       flex-shrink: 0; /* Prevent shrinking */
-   }
-
-   /* Username Box */
-   .username-box {
-       font-size: 0.9em;
-       color: #333;
-       border: 1px solid #6c757d; /* Match sign out button border */
-       padding: 3px 8px;
-       border-radius: 4px;
-       margin-bottom: 4px; /* Space between username and button */
-       text-align: right;
-       background-color: #f8f9fa; /* Light background */
-       white-space: nowrap; /* Prevent wrapping */
-       max-width: 150px; /* Limit width */
-       overflow: hidden;
-       text-overflow: ellipsis; /* Add ... if too long */
-   }
-
-
-   #message-display {
-    height: calc(60vh - 100px); /* Adjust height based on potential header/footer */
+#model-selector {
+    padding: 6px 10px;
     border: 1px solid #ccc;
-    margin-bottom: 10px;
-    overflow-y: scroll; /* Enable vertical scrolling */
-    padding: 10px;
+    border-radius: 4px;
     background-color: #fff;
-    border-radius: 6px;
-   }
-
-
-   #input-area {
-    display: flex; /* Arrange items horizontally */
-    padding: 10px;
-    border-top: 1px solid #ccc;
-    background-color: #f8f8f8;
-    border-radius: 0 0 6px 6px; /* Round bottom corners if part of chat-ui */
-   }
-
-
-   #input-area {
-    display: flex; /* Arrange items horizontally */
-    align-items: center; /* Align items vertically */
-    padding: 10px;
-    border-top: 1px solid #ccc;
-    background-color: #f8f8f8;
-   }
-
-
-   #mic-button, #send-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 12px;
-    margin: 0 5px;
+    font-size: 0.9em;
+    min-width: 200px;
+    max-width: 350px;
     cursor: pointer;
-    font-size: 1.2em; /* Adjust icon size */
-    line-height: 1; /* Ensure button height matches icon */
-   }
+    text-align: center; /* Center text */
+    appearance: none; /* Try to hide default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /* Basic scrollbar hiding (might not work everywhere) */
+    scrollbar-width: none; /* Firefox */
+}
+#model-selector::-ms-expand { /* IE/Edge */
+    display: none;
+}
+#model-selector::-webkit-scrollbar { /* Chrome, Safari, Opera */
+    display: none;
+}
+#model-selector:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
 
+/* User Info Area Styling */
+.user-info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
 
-   #mic-button:hover, #send-button:hover {
-    background-color: #0056b3;
-   }
+.username-box {
+    font-size: 0.9em;
+    color: #333;
+    border: 1px solid #6c757d; /* Match sign out button border */
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    text-align: right;
+    background-color: #f8f9fa;
+    white-space: nowrap;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-
-   /* Phase 10: Style for main mic button when recording */
-   #mic-button.recording {
-       background-color: #dc3545; /* Red indicator */
-   }
-   #mic-button.recording:hover {
-       background-color: #c82333; /* Darker red on hover */
-   }
-
-
-   #chat-input {
-    flex-grow: 1; /* Allow textarea to take up remaining space */
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 8px;
-    font-size: 1em;
-    resize: none; /* Prevent manual resizing */
-    min-height: 30px; /* Minimum height for one line */
-    max-height: 100px; /* Optional: Limit max height */
-    overflow-y: auto; /* Add scroll if text exceeds max-height */
-   }
-
-
-
-
-   /* --- Sign Out Button Style --- */
-   #signout-button {
+#signout-button {
     padding: 5px 10px;
-    background-color: #6c757d; /* Grey */
+    background-color: #6c757d;
     color: white;
-    border: 1px solid #6c757d; /* Add border */
+    border: 1px solid #6c757d;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9em;
-    /* margin-left: auto; Removed, handled by container */
-   }
-   #signout-button:hover {
+}
+#signout-button:hover {
     background-color: #5a6268;
-   }
+}
 
-
-
-
-   /* --- Chat UI Layout --- */
-   #chat-ui {
-    display: flex; /* Use flexbox for main layout */
-    flex-direction: column; /* Stack elements vertically */
-    height: 60vh; /* Example starting height */
-    min-height: 300px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    overflow: hidden; /* Contain children */
-    background-color: #fff; /* Background for the whole chat area */
-    margin-top: 15px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-   }
-
-
-
-
-   /* --- Message Bubble Styles --- */
-   .message-bubble {
-    padding: 10px 15px;
-    border-radius: 18px;
-    margin-bottom: 12px;
-    max-width: 75%;
-    word-wrap: break-word;
-    clear: both;
-    box-shadow: 0 2px 3px rgba(0,0,0,0.1);
-    position: relative;
+/* --- Chat UI --- */
+#chat-ui {
     display: flex;
     flex-direction: column;
-    line-height: 1.4;
-   }
+    height: 70vh; /* Slightly larger height */
+    min-height: 400px; /* Increased min-height */
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    margin-top: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
 
+/* Message Display Area */
+#message-display {
+    flex-grow: 1; /* Allow message area to take up available space */
+    border: 1px solid #ccc;
+    margin: 10px; /* Add margin inside chat-ui */
+    margin-bottom: 0; /* Remove bottom margin to connect with input */
+    overflow-y: scroll;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 6px;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+#message-display::-webkit-scrollbar { /* Hide scrollbar Webkit */
+    display: none;
+}
 
-   /* Timestamp Styling */
-   .timestamp {
-    font-size: 0.7em;
-    color: #999;
-    margin-top: 5px;
-    text-align: right;
-    align-self: flex-end;
-   }
-
-
-   /* User Bubble */
-   .user-bubble {
-    background-color: #007bff;
-    color: white;
-    margin-left: auto;
-    float: right;
-    border-bottom-right-radius: 5px;
-   }
-   .user-bubble .timestamp {
-    color: #e0e0e0;
-   }
-
-
-   /* AI Bubble */
-   .ai-bubble {
-    background-color: #f1f1f1;
-    color: #333;
-    margin-right: auto;
-    float: left;
-    border-bottom-left-radius: 5px;
-   }
-   .ai-bubble .timestamp {
-    color: #6c757d;
-   }
-
-
-   /* System Message Bubble */
-   .system-bubble {
-    font-style: italic;
-    color: #6c757d;
-    text-align: center;
-    width: 100%;
-    max-width: none;
-    background-color: transparent;
-    box-shadow: none;
-    float: none;
-    margin-bottom: 8px;
-    padding: 2px 0;
-    border-radius: 0;
-   }
-
-
-   /* Clearfix */
-   #message-display::after {
-    content: "";
-    clear: both;
-    display: table;
-   }
-
-
-   /* --- Phase 6: Bottom Banner & Popups --- */
-   #bottom-banner {
+/* Bottom Banner */
+#bottom-banner {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px 0;
+    padding: 8px 0; /* Increased padding */
     border-top: 1px solid #eee;
     flex-shrink: 0;
-    order: 2;
-   }
+    order: 2; /* Place below message display */
+    background-color: #f8f9fa; /* Light bg */
+}
 
-   #input-area { order: 3; }
-   #message-display { order: 1; }
-
-
-   .banner-button {
+.banner-button {
     background-color: #6c757d;
     color: white;
     border: none;
@@ -299,446 +155,339 @@ body {
     justify-content: center;
     align-items: center;
     transition: background-color 0.2s ease;
-   }
-   .banner-button:hover { background-color: #5a6268; }
+}
+.banner-button:hover { background-color: #5a6268; }
 
+/* Input Area */
+#input-area {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    background-color: #f8f8f8;
+    order: 3; /* Place below banner */
+}
 
-   /* Popup Backdrop */
-   .popup-backdrop {
-    position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999; display: none;
-   }
-
-
-   /* Basic Popup Styling */
-   .popup {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%; max-width: 600px;
-    background-color: white;
-    border: 1px solid black; border-radius: 8px;
-    padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    z-index: 1000; display: none;
-    max-height: 85vh; overflow-y: auto;
-   }
-   .popup h2 {
-    margin-top: 0; border-bottom: 1px solid #eee;
-    padding-bottom: 10px; margin-bottom: 15px;
-    font-size: 1.4em;
-   }
-   .close-popup-btn {
-    display: block; margin-top: 20px; margin-left: auto;
-    padding: 8px 15px; background-color: #6c757d;
-    color: white; border: none; border-radius: 5px;
+#mic-button, #send-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin: 0 5px;
     cursor: pointer;
-   }
-   .close-popup-btn:hover { background-color: #5a6268; }
+    font-size: 1.2em;
+    line-height: 1;
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+#mic-button:hover, #send-button:hover { background-color: #0056b3; }
 
+#mic-button.recording { background-color: #dc3545; }
+#mic-button.recording:hover { background-color: #c82333; }
 
-   /* --- Phase 7: Message Action Buttons --- */
-   .message-actions {
+#chat-input {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 1em;
+    resize: none;
+    min-height: 30px;
+    max-height: 100px;
+    overflow-y: auto;
+    line-height: 1.4; /* Better text spacing */
+}
+
+/* --- Message Bubbles --- */
+.message-bubble {
+    padding: 10px 15px;
+    border-radius: 18px;
+    margin-bottom: 12px;
+    max-width: 75%;
+    word-wrap: break-word;
+    clear: both;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
+}
+.timestamp {
+    font-size: 0.7em;
+    color: #999;
+    margin-top: 5px;
+    text-align: right;
+    align-self: flex-end;
+}
+.user-bubble {
+    background-color: #007bff; color: white;
+    margin-left: auto; float: right;
+    border-bottom-right-radius: 5px;
+}
+.user-bubble .timestamp { color: #e0e0e0; }
+
+.ai-bubble {
+    background-color: #f1f1f1; color: #333;
+    margin-right: auto; float: left;
+    border-bottom-left-radius: 5px;
+}
+.ai-bubble .timestamp { color: #6c757d; }
+
+.system-bubble {
+    font-style: italic; color: #6c757d; text-align: center;
+    width: 100%; max-width: none; background-color: transparent;
+    box-shadow: none; float: none; margin-bottom: 8px;
+    padding: 2px 0; border-radius: 0;
+}
+#message-display::after { content: ""; clear: both; display: table; }
+
+/* Message Actions */
+.message-actions {
     display: flex; justify-content: flex-end; align-items: center;
     margin-top: 5px; margin-left: auto; height: 18px;
     opacity: 0; transition: opacity 0.2s ease-in-out;
-   }
-   .message-bubble:hover .message-actions { opacity: 1; }
+}
+.message-bubble:hover .message-actions { opacity: 1; }
 
-   .action-button {
+.action-button {
     background: none; border: none; color: #6c757d;
     cursor: pointer; font-size: 0.85em; padding: 0;
     margin-left: 8px; line-height: 1;
-   }
-   .action-button:hover { color: #343a40; }
-   .user-bubble .action-button { color: #adb5bd; }
-   .user-bubble .action-button:hover { color: #f8f9fa; }
-   .system-bubble .message-actions { display: none; }
+}
+.action-button:hover { color: #343a40; }
+.user-bubble .action-button { color: #adb5bd; }
+.user-bubble .action-button:hover { color: #f8f9fa; }
+.system-bubble .message-actions { display: none; }
 
+/* --- Popups --- */
+.popup-backdrop {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Slightly darker */
+    z-index: 999; display: none;
+}
 
-   /* --- Phase 9: TTS Popup Styling --- */
-   #tts-input-area {
-    display: flex; flex-direction: column;
-    align-items: flex-start; margin-bottom: 10px;
-   }
-   #tts-text-input {
-    width: 100%; box-sizing: border-box; border: 1px solid #ccc;
-    border-radius: 5px; padding: 8px; font-size: 1em;
-    resize: vertical; min-height: 60px; max-height: 150px;
-    overflow-y: auto; margin-bottom: 8px;
-   }
-   #tts-controls {
-    display: flex; justify-content: center; /* Centered buttons */
-    align-items: center; width: 100%;
-   }
-   #tts-send-button, #tts-mic-button {
-    background-color: #007bff; color: white; border: none;
-    border-radius: 5px; padding: 8px 12px; cursor: pointer;
-    font-size: 1.1em; margin: 0 8px; width: 40px; height: 40px;
-    display: flex; justify-content: center; align-items: center;
-   }
-   #tts-mic-button.recording { background-color: #dc3545; }
-   #tts-mic-button.recording:hover { background-color: #c82333; }
-   #tts-send-button:hover, #tts-mic-button:hover { background-color: #0056b3; }
+.popup {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; max-width: 700px; /* Increased max-width */
+    background-color: #ffffff;
+    border-radius: 10px; /* Slightly more rounded */
+    padding: 25px 30px; /* More padding */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25); /* Stronger shadow */
+    z-index: 1000; display: none;
+    max-height: 85vh; /* Keep max height */
+    display: flex; /* Use flexbox for better internal layout */
+    flex-direction: column;
+}
+.popup h2 {
+    margin-top: 0; border-bottom: 1px solid #eee;
+    padding-bottom: 15px; /* More space below title */
+    margin-bottom: 20px; /* More space above content */
+    font-size: 1.5em; /* Larger title */
+    color: #333;
+    flex-shrink: 0; /* Prevent title from shrinking */
+}
+.popup-content-area { /* Add a wrapper for scrollable content */
+    overflow-y: auto; /* Scroll only the content */
+    flex-grow: 1; /* Allow content to fill space */
+    margin-bottom: 20px; /* Space before close button */
+}
+.popup label { /* Style labels in popups */
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 3px;
+    font-weight: bold;
+    font-size: 0.9em;
+    color: #555;
+}
+.popup input[type="text"],
+.popup input[type="number"],
+.popup textarea,
+.popup select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 0.95em;
+}
+.popup textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+.popup button:not(.close-popup-btn):not(.banner-button):not(.action-button) { /* Style general popup buttons */
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    margin-right: 8px;
+    margin-top: 5px;
+}
+.popup button:not(.close-popup-btn):not(.banner-button):not(.action-button):hover {
+    background-color: #0056b3;
+}
+.popup button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
 
-   #tts-output-area {
-    margin-top: 5px; max-height: 200px; overflow-y: auto;
-    border: 1px solid #eee; padding: 10px; border-radius: 5px;
+.close-popup-btn {
+    display: block; margin-top: auto; /* Push to bottom */
+    margin-left: auto; margin-right: auto; /* Center */
+    padding: 10px 20px; /* Larger button */
+    background-color: #6c757d;
+    color: white; border: none; border-radius: 5px;
+    cursor: pointer; font-size: 1em;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+.close-popup-btn:hover { background-color: #5a6268; }
+
+/* --- History Popup Specific --- */
+#history-list { min-height: 100px; }
+.history-item {
+    padding: 8px 5px;
+    border-bottom: 1px dotted #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.history-item:last-child { border-bottom: none; }
+.history-item button {
+    padding: 3px 8px;
+    font-size: 0.85em;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    color: #495057;
+}
+.history-item button:hover { background-color: #dee2e6; }
+.history-item button[style*="color: red"] { color: red; }
+
+/* --- TTS Popup Specific --- */
+#tts-input-area { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 15px; }
+#tts-text-input { width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; padding: 10px; font-size: 1em; resize: vertical; min-height: 60px; max-height: 150px; overflow-y: auto; margin-bottom: 10px; }
+#tts-controls { display: flex; justify-content: center; align-items: center; width: 100%; }
+#tts-send-button, #tts-mic-button { background-color: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 1.1em; margin: 0 10px; display: flex; justify-content: center; align-items: center; }
+#tts-mic-button.recording { background-color: #dc3545; }
+#tts-mic-button.recording:hover { background-color: #c82333; }
+#tts-send-button:hover, #tts-mic-button:hover { background-color: #0056b3; }
+
+#tts-output-area { margin-top: 10px; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px; background-color: #f9f9f9; }
+.tts-entry { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #ddd; margin-bottom: 5px; }
+.tts-entry:last-child { border-bottom: none; }
+.tts-entry-text { flex-grow: 1; margin-right: 10px; font-size: 0.95em; word-break: break-word; }
+.tts-replay-button { background-color: #28a745; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 0.85em; white-space: nowrap; flex-shrink: 0; }
+.tts-replay-button:hover { background-color: #218838; }
+.tts-replay-button i { margin-right: 3px; }
+.tts-status { padding: 8px 0; text-align: center; color: #666; font-style: italic; }
+
+/* --- Image Generation Popup Specific --- */
+#img-gen-modes { display: flex; border-bottom: 1px solid #ccc; margin-bottom: 20px; flex-shrink: 0; }
+.img-gen-mode-btn { padding: 10px 18px; border: none; background-color: transparent; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; color: #6c757d; font-size: 1em; }
+.img-gen-mode-btn.active { border-bottom-color: #007bff; color: #007bff; font-weight: bold; }
+.img-gen-mode-btn:disabled { color: #ccc; cursor: not-allowed; }
+
+.img-gen-mode-panel { display: none; }
+.img-gen-mode-panel.active { display: block; }
+
+/* Styles for Story, Card, Comic inputs */
+#img-gen-story-mode input, #img-gen-story-mode textarea,
+#img-gen-card-mode input, #img-gen-card-mode textarea, #img-gen-card-mode select,
+#img-gen-comic-mode input, #img-gen-comic-mode textarea {
+    margin-bottom: 12px; /* More space between inputs */
+}
+
+/* Button container for generate/download */
+.img-gen-buttons {
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* Output areas for story/comic */
+.img-gen-output-area {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px dashed #ccc;
+    min-height: 150px;
+    border-radius: 5px;
     background-color: #f9f9f9;
-   }
-   .tts-entry {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 8px; border-bottom: 1px solid #ddd; margin-bottom: 5px;
-   }
-   .tts-entry:last-child { border-bottom: none; }
-   .tts-entry-text {
-    flex-grow: 1; margin-right: 10px; font-size: 0.95em;
-    word-break: break-word;
-   }
-   .tts-replay-button {
-    background-color: #28a745; color: white; border: none;
-    border-radius: 4px; padding: 4px 8px; cursor: pointer;
-    font-size: 0.85em; white-space: nowrap; flex-shrink: 0;
-   }
-   .tts-replay-button:hover { background-color: #218838; }
-   .tts-replay-button i { margin-right: 3px; }
+}
+.story-chapter h3 { margin-top: 15px; margin-bottom: 5px; font-size: 1.1em; }
+.story-image, .comic-panel-image { max-width: 80%; margin: 10px auto; display: block; border: 1px solid #eee; }
+.story-paragraph { line-height: 1.5; margin-bottom: 10px; }
 
-   .tts-audio-entry {
-       display: flex; align-items: center; padding: 5px 0;
-       border-bottom: 1px dotted #ccc; margin-bottom: 5px;
-   }
-   .tts-audio-entry:last-child { border-bottom: none; }
-   .tts-audio-entry audio { flex-grow: 1; height: 40px; }
-   .tts-audio-timestamp {
-       font-size: 0.75em; color: #666; margin-left: 10px;
-       white-space: nowrap; flex-shrink: 0;
-   }
-   .tts-status { /* Style for status messages */
-       padding: 5px 0;
-       text-align: center;
-       color: #666;
-       font-style: italic;
-   }
+/* Card specific styles */
+.card-image-controls { margin: 5px 0 10px 0; display: flex; gap: 10px; }
+.card-image-controls button { flex-grow: 1; } /* Make buttons fill space */
+#card-image-preview-area {
+    border: 1px dashed #ccc; min-height: 80px; padding: 5px;
+    margin-bottom: 10px; border-radius: 4px; background: #fafafa;
+}
+#card-image-search-results img { width: 100%; height: 80px; object-fit: cover; cursor: pointer; border: 2px solid transparent; border-radius: 3px; }
+#card-image-search-results img:hover { border-color: #007bff; }
+#card-image-search-results img.selected { border-color: #28a745; box-shadow: 0 0 5px #28a745; }
 
+/* Basic mode results */
+.img-gen-results-container { margin-top: 15px; }
+#img-gen-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; padding: 10px; border: 1px solid #eee; min-height: 120px; background-color: #f9f9f9; border-radius: 5px; }
+.img-gen-thumbnail-container { position: relative; line-height: 0; }
+.img-gen-thumbnail { width: 100%; height: 120px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: block; }
+.img-gen-save-btn { position: absolute; bottom: 5px; right: 5px; background-color: rgba(0, 0, 0, 0.6); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 0.8em; display: flex; justify-content: center; align-items: center; opacity: 0.7; transition: opacity 0.2s ease; }
+.img-gen-thumbnail-container:hover .img-gen-save-btn { opacity: 1; }
+.img-gen-save-btn:hover { background-color: rgba(0, 0, 0, 0.8); }
 
-   /* --- Phase 11: Image Generation Popup --- */
-   #img-gen-modes {
-       display: flex;
-       border-bottom: 1px solid #ccc;
-       margin-bottom: 15px;
-   }
-   .img-gen-mode-btn {
-       padding: 8px 15px;
-       border: none;
-       background-color: transparent;
-       cursor: pointer;
-       border-bottom: 3px solid transparent;
-       margin-bottom: -1px; /* Overlap border */
-       color: #6c757d;
-   }
-   .img-gen-mode-btn.active {
-       border-bottom-color: #007bff;
-       color: #007bff;
-       font-weight: bold;
-   }
-   .img-gen-mode-btn:disabled {
-       color: #ccc;
-       cursor: not-allowed;
-   }
+#img-gen-loading, #img-gen-error { grid-column: 1 / -1; text-align: center; padding: 20px; color: #666; }
+#img-gen-error { color: red; }
 
-   /* Hide non-active mode panels */
-   .img-gen-mode-panel {
-       display: none;
-   }
-   .img-gen-mode-panel.active {
-       display: block;
-   }
+/* Image Modal */
+#image-modal { border: 1px solid #555; background-color: #fdfdfd; padding: 15px; box-sizing: border-box; }
+#expanded-image { max-width: 100%; max-height: calc(80vh - 80px); display: block; margin: 0 auto; object-fit: contain; }
+#image-modal-controls { text-align: center; margin-top: 15px; }
+#image-modal-controls button { padding: 8px 16px; margin: 0 10px; border-radius: 5px; cursor: pointer; border: 1px solid #ccc; font-size: 0.9em; }
+#image-modal-save { background-color: #28a745; color: white; border-color: #28a745; }
+#image-modal-save:hover { background-color: #218838; }
+#image-modal-close { background-color: #6c757d; color: white; border-color: #6c757d; }
+#image-modal-close:hover { background-color: #5a6268; }
 
-   #img-gen-prompt {
-       width: 100%;
-       box-sizing: border-box;
-       min-height: 60px;
-       margin-bottom: 10px;
-       padding: 8px;
-       border: 1px solid #ccc;
-       border-radius: 4px;
-       resize: vertical;
-   }
+/* --- OCR Popup Specific --- */
+#ocr-content { display: flex; flex-direction: column; gap: 15px; }
+#ocr-upload-btn { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; text-align: center; font-size: 1em; align-self: flex-start; }
+#ocr-upload-btn:hover { background-color: #0056b3; }
+#ocr-upload-btn i { margin-right: 5px; }
+#ocr-thumbnail-area { border: 1px dashed #ccc; min-height: 100px; max-height: 200px; display: flex; justify-content: center; align-items: center; position: relative; background-color: #f9f9f9; border-radius: 5px; overflow: hidden; }
+.ocr-thumbnail-img { max-width: 100%; max-height: 190px; object-fit: contain; }
+.ocr-remove-thumb-btn { position: absolute; top: 5px; right: 5px; background-color: rgba(220, 53, 69, 0.8); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 0.8em; display: flex; justify-content: center; align-items: center; line-height: 1; font-weight: bold; }
+.ocr-remove-thumb-btn:hover { background-color: #dc3545; }
+#ocr-extract-btn, #ocr-copy-btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; align-self: flex-start; }
+#ocr-extract-btn { background-color: #28a745; color: white; }
+#ocr-extract-btn:hover { background-color: #218838; }
+#ocr-extract-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+#ocr-extract-btn i { margin-right: 5px; }
+#ocr-result-text { width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; padding: 8px; font-size: 0.95em; resize: vertical; background-color: #e9ecef; min-height: 100px; }
+#ocr-copy-btn { background-color: #17a2b8; color: white; margin-top: -5px; }
+#ocr-copy-btn:hover { background-color: #138496; }
+#ocr-copy-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+#ocr-copy-btn i { margin-right: 5px; }
+#ocr-status { color: #6c757d; font-style: italic; text-align: center; }
 
-   #img-gen-generate-btn {
-       display: block;
-       margin: 0 auto 15px auto;
-       padding: 10px 20px;
-       background-color: #007bff;
-       color: white;
-       border: none;
-       border-radius: 5px;
-       cursor: pointer;
-       font-size: 1em;
-   }
-   #img-gen-generate-btn:hover { background-color: #0056b3; }
-   #img-gen-generate-btn:disabled { background-color: #ccc; cursor: not-allowed; }
-
-
-   #img-gen-results {
-       display: grid;
-       grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-       gap: 10px;
-       padding: 10px;
-       border: 1px solid #eee;
-       min-height: 100px;
-       background-color: #f9f9f9;
-       border-radius: 5px;
-   }
-
-   .img-gen-thumbnail-container {
-        position: relative;
-        line-height: 0;
-   }
-
-   .img-gen-thumbnail {
-       width: 100%;
-       height: 100px;
-       object-fit: cover;
-       border: 1px solid #ddd;
-       border-radius: 4px;
-       cursor: pointer;
-       display: block;
-   }
-
-   .img-gen-save-btn {
-       position: absolute;
-       bottom: 5px; right: 5px;
-       background-color: rgba(0, 0, 0, 0.6);
-       color: white; border: none; border-radius: 50%;
-       width: 28px; height: 28px; cursor: pointer;
-       font-size: 0.8em; display: flex;
-       justify-content: center; align-items: center;
-       opacity: 0.7; transition: opacity 0.2s ease;
-   }
-   .img-gen-thumbnail-container:hover .img-gen-save-btn { opacity: 1; }
-   .img-gen-save-btn:hover { background-color: rgba(0, 0, 0, 0.8); }
-
-
-   #img-gen-loading, #img-gen-error {
-       grid-column: 1 / -1;
-       text-align: center;
-       padding: 20px;
-       color: #666;
-   }
-   #img-gen-error { color: red; }
-
-
-   /* Image Expansion Modal Styles */
-   #image-modal {
-       border: 1px solid #555;
-       background-color: #fdfdfd;
-       padding: 15px; /* More padding */
-       box-sizing: border-box;
-   }
-    #expanded-image {
-       max-width: 100%;
-       max-height: calc(80vh - 80px); /* Adjusted max-height based on padding/controls */
-       display: block;
-       margin: 0 auto;
-       object-fit: contain; /* Ensure whole image is visible */
-    }
-   #image-modal-controls {
-       text-align: center;
-       margin-top: 15px; /* More space */
-   }
-   #image-modal-controls button {
-       padding: 8px 16px;
-       margin: 0 10px;
-       border-radius: 5px;
-       cursor: pointer;
-       border: 1px solid #ccc;
-       font-size: 0.9em;
-   }
-   #image-modal-save {
-       background-color: #28a745;
-       color: white;
-       border-color: #28a745;
-   }
-   #image-modal-save:hover { background-color: #218838; }
-   #image-modal-close {
-       background-color: #6c757d;
-       color: white;
-       border-color: #6c757d;
-   }
-   #image-modal-close:hover { background-color: #5a6268; }
-
-
-   /* --- Phase 12: OCR Popup Styling --- */
-   #ocr-content {
-       display: flex;
-       flex-direction: column;
-       gap: 15px; /* Add spacing between elements */
-   }
-
-   #ocr-upload-btn {
-       padding: 10px 15px;
-       background-color: #007bff;
-       color: white;
-       border: none;
-       border-radius: 5px;
-       cursor: pointer;
-       text-align: center;
-       font-size: 1em;
-       align-self: flex-start; /* Align button left */
-   }
-   #ocr-upload-btn:hover { background-color: #0056b3; }
-   #ocr-upload-btn i { margin-right: 5px; }
-
-   #ocr-thumbnail-area {
-       border: 1px dashed #ccc;
-       min-height: 100px;
-       max-height: 200px;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       position: relative; /* For remove button */
-       background-color: #f9f9f9;
-       border-radius: 5px;
-       overflow: hidden; /* Hide overflow if image is too big */
-   }
-   .ocr-thumbnail-img {
-       max-width: 100%;
-       max-height: 190px; /* Slightly less than container */
-       object-fit: contain;
-   }
-   .ocr-remove-thumb-btn {
-       position: absolute;
-       top: 5px;
-       right: 5px;
-       background-color: rgba(220, 53, 69, 0.8); /* Red with transparency */
-       color: white;
-       border: none;
-       border-radius: 50%;
-       width: 24px;
-       height: 24px;
-       cursor: pointer;
-       font-size: 0.8em;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       line-height: 1;
-       font-weight: bold;
-   }
-   .ocr-remove-thumb-btn:hover { background-color: #dc3545; }
-
-   #ocr-extract-btn, #ocr-copy-btn {
-       padding: 10px 15px;
-       border: none;
-       border-radius: 5px;
-       cursor: pointer;
-       font-size: 1em;
-       align-self: flex-start; /* Align left */
-   }
-   #ocr-extract-btn {
-       background-color: #28a745; /* Green */
-       color: white;
-   }
-   #ocr-extract-btn:hover { background-color: #218838; }
-   #ocr-extract-btn:disabled { background-color: #ccc; cursor: not-allowed; }
-   #ocr-extract-btn i { margin-right: 5px; }
-
-   #ocr-result-text {
-       width: 100%;
-       box-sizing: border-box;
-       border: 1px solid #ccc;
-       border-radius: 5px;
-       padding: 8px;
-       font-size: 0.95em;
-       resize: vertical;
-       background-color: #e9ecef; /* Indicate readonly */
-       min-height: 100px; /* Ensure decent size */
-   }
-
-   #ocr-copy-btn {
-       background-color: #17a2b8; /* Info blue */
-       color: white;
-       margin-top: -5px; /* Pull slightly closer to textarea */
-   }
-   #ocr-copy-btn:hover { background-color: #138496; }
-   #ocr-copy-btn:disabled { background-color: #ccc; cursor: not-allowed; }
-   #ocr-copy-btn i { margin-right: 5px; }
-
-   #ocr-status {
-       color: #6c757d;
-       font-style: italic;
-       text-align: center;
-   }
-
-
-    /* --- Phase 13: Vision Popup Styling --- */
-    #vision-content {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    #vision-video-container {
-        background-color: #333; /* Dark background for video */
-    }
-
-    #vision-video-preview {
-        display: block;
-        width: 100%;
-        max-height: 40vh; /* Limit video height */
-        object-fit: contain; /* Show whole video */
-    }
-
-    #vision-controls button,
-    #vision-actions button,
-    #vision-enable-cam-btn {
-        padding: 8px 12px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 0.9em;
-        margin: 0 5px;
-    }
-    #vision-controls button i,
-    #vision-actions button i,
-    #vision-enable-cam-btn i {
-        margin-right: 5px;
-    }
-
-    #vision-enable-cam-btn { background-color: #007bff; color: white;}
-    #vision-enable-cam-btn:hover { background-color: #0056b3; }
-
-    #vision-describe-btn { background-color: #28a745; color: white; }
-    #vision-describe-btn:hover { background-color: #218838; }
-
-    #vision-stop-cam-btn { background-color: #dc3545; color: white; }
-    #vision-stop-cam-btn:hover { background-color: #c82333; }
-
-    #vision-results-text {
-        width: 100%;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 8px;
-        font-size: 0.95em;
-        resize: vertical;
-        min-height: 80px;
-        background-color: #e9ecef; /* Readonly indicator */
-    }
-
-    #vision-actions button {
-        background-color: #6c757d;
-        color: white;
-    }
-     #vision-actions button:hover {
-        background-color: #5a6268;
-    }
-     #vision-actions button:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-    }
-
-     #vision-status {
-        color: #6c757d;
-        font-style: italic;
-    }
+/* --- Vision Popup Specific --- */
+#vision-content { display: flex; flex-direction: column; gap: 10px; }
+#vision-video-container { background-color: #333; border-radius: 5px; overflow: hidden;}
+#vision-video-preview { display: block; width: 100%; max-height: 40vh; object-fit: contain; }
+#vision-controls button, #vision-actions button, #vision-enable-cam-btn { padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin: 0 5px; }
+#vision-controls button i, #vision-actions button i, #vision-enable-cam-btn i { margin-right: 5px; }
+#vision-enable-cam-btn { background-color: #007bff; color: white; }
+#vision-enable-cam-btn:hover { background-color: #0056b3; }
+#vision-describe-btn { background-color: #28a745; color: white; }
+#vision-describe-btn:hover { background-color: #218838; }
+#vision-stop-cam-btn { background-color: #dc3545; color: white; }
+#vision-stop-cam-btn:hover { background-color: #c82333; }
+#vision-results-text { width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; padding: 8px; font-size: 0.95em; resize: vertical; min-height: 80px; background-color: #e9ecef; }
+#vision-actions button { background-color: #6c757d; color: white; }
+#vision-actions button:hover { background-color: #5a6268; }
+#vision-actions button:disabled { background-color: #ccc; cursor: not-allowed; }
+#vision-status { color: #6c757d; font-style: italic; }
