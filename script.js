@@ -46,11 +46,18 @@ const ttsAudioPlayer = document.getElementById('tts-audio-player');
 // --- End Phase 9 Elements
 
 
+// Phase 10 elements
+const micButton = document.getElementById('mic-button');
+// --- End Phase 10 elements
+
+
 // --- App State ---
 let selectedModel = 'gpt-4o-mini';
 let isChatInitialized = false;
 let activePopup = null; // Track the currently open popup - Phase 6
 let chatHistory = []; // Array to store chat history
+let recognition; // Speech recognition object
+let isRecording = false;
 
 
 // Model list
@@ -274,7 +281,7 @@ async function sendMessage() {
  displayMessage(`AI (${selectedModel}) is thinking...`, 'system');
  try {
   if (typeof puter === 'undefined' || !puter.ai || !puter.ai.chat) throw new Error("Puter SDK/AI module not available.");
-  console.log(`Sending (Model: ${selectedModel}): "${currentInputText}"`);
+  console.log(`Sending (Model: <span class="math-inline">\{selectedModel\}\)\: "</span>{currentInputText}"`);
   const response = await puter.ai.chat(currentInputText, { model: selectedModel });
   console.log("Received response:", response);
   const loadingIndicator = document.getElementById('loading-indicator');
@@ -509,7 +516,7 @@ function displayChatHistory() {
   savedHistory.forEach((session, index) => {
    const historyItem = document.createElement('div');
    historyItem.classList.add('history-item');
-   historyItem.textContent = `Chat ${index + 1}: ${session.messages[0].text.substring(0, 50)}... (${new Date(session.timestamp).toLocaleString()})`;
+   historyItem.textContent = `Chat ${index + 1}: <span class="math-inline">\{session\.messages\[0\]\.text\.substring\(0, 50\)\}\.\.\. \(</span>{new Date(session.timestamp).toLocaleString()})`;
    historyItem.addEventListener('click', () => loadChatFromHistory(index));
    historyList.appendChild(historyItem);
   });
@@ -612,6 +619,12 @@ function initializeTTS() {
 
 
  ttsSendButton.addEventListener('click', handleTTSSend);
+ ttsTextInput.addEventListener('keypress', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+   event.preventDefault();
+   handleTTSSend();
+  }
+ });
  //ttsMicButton.addEventListener('click', handleTTsMic); // Placeholder for mic functionality
 }
 
@@ -622,6 +635,11 @@ async function handleTTSSend() {
 
 
  try {
+  if (typeof puter === 'undefined' || !puter.ai || !puter.ai.chat || !puter.ai.txt2speech) {
+   throw new Error("Puter SDK/AI or txt2speech module not available.");
+  }
+
+
   const response = await puter.ai.chat(text, { model: selectedModel });
   const aiText = response?.text || "Sorry, couldn't get response.";
   console.log("AI response for TTS:", aiText); // Log AI response
@@ -657,6 +675,82 @@ popups.tts.addEventListener('show', initializeTTS);
 
 
 // --- Phase 10: Microphone Input ---
+
+
+function initializeMicInput() {
+ if (!micButton || !chatInput) {
+  console.warn("Microphone or chat input elements not found.");
+  return;
+ }
+
+
+ micButton.addEventListener('click', toggleRecording);
+}
+
+
+function toggleRecording() {
+ if (isRecording) {
+  stopRecording();
+ } else {
+  startRecording();
+ }
+}
+
+
+function startRecording() {
+ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+
+  recognition.onstart = () => {
+   isRecording = true;
+   micButton.textContent = "⏺️"; // Change icon to recording
+  };
+
+
+  recognition.onresult = (event) => {
+   const transcript = Array.from(event.results)
+    .map(result => result[0])
+    .map(result => result.transcript)
+    .join('');
+   chatInput.value = transcript;
+  };
+
+
+  recognition.onend = () => {
+   isRecording = false;
+   micButton.textContent = "🎤"; // Change icon back
+  };
+
+
+  recognition.onerror = (event) => {
+   console.error("Speech recognition error:", event.error);
+   isRecording = false;
+   micButton.textContent = "🎤";
+  };
+
+
+  recognition.start();
+ } else {
+  console.warn("Web Speech API is not supported in this browser.");
+ }
+}
+
+
+function stopRecording() {
+ if (recognition) {
+  recognition.stop();
+ }
+ isRecording = false;
+ micButton.textContent = "🎤";
+}
+
+
+// Call initializeMicInput when the main chat UI is displayed
+chatUiDiv.addEventListener('show', initializeMicInput);
 
 
 
