@@ -10,13 +10,14 @@ const chatUiDiv = document.getElementById('chat-ui');
 const chatInput = document.getElementById('chat-input');
 const sendButton = document.getElementById('send-button');
 const messageDisplay = document.getElementById('message-display');
-const modelSelector = document.getElementById('model-selector');
+const modelSelector = document.getElementById('model-selector'); // Added Phase 4
 
 // --- App State ---
-let selectedModel = 'gpt-4o-mini';
-let isChatInitialized = false;
+let selectedModel = 'gpt-4o-mini'; // Default model [cite: 8] - Added Phase 4
+let isChatInitialized = false; // Flag to track listener setup
 
-// Model list (ensure this is accurate based on your docs)
+// List of known models from puterAPI.txt - Added Phase 4
+// Ensure this list matches the documentation you have access to
 const availableModels = [
     'gpt-4o-mini', 'gpt-4o', 'o1', 'o1-mini', 'o1-pro', 'o3', 'o3-mini', 'o4-mini',
     'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano', 'gpt-4.5-preview',
@@ -31,22 +32,32 @@ const availableModels = [
 
 
 // --- Authentication Logic ---
+
 async function updateUiForAuthState(isSignedIn) {
-    if (!authSectionDiv || !chatUiDiv) { console.error("Core UI elements missing."); return; }
+    // Ensure critical elements exist before proceeding
+    if (!authSectionDiv || !chatUiDiv) {
+        console.error("Core UI elements (authSectionDiv or chatUiDiv) not found. Cannot update UI state.");
+        return;
+    }
+
     if (isSignedIn) {
         try {
             if(authStatusDiv) authStatusDiv.textContent = 'Fetching user info...';
             if (typeof puter === 'undefined' || !puter.auth) throw new Error("Puter SDK or auth module not available.");
-            const user = await puter.auth.getUser();
-            if(authStatusDiv) authStatusDiv.textContent = `Signed in as: ${user.username}`;
+            const user = await puter.auth.getUser(); //
+            if(authStatusDiv) authStatusDiv.textContent = `Signed in as: ${user.username}`; // [cite: 784, 143]
+
             authSectionDiv.style.display = 'none';
-            chatUiDiv.style.display = 'flex';
-            if(signOutButton) signOutButton.style.display = 'inline-block';
+            chatUiDiv.style.display = 'flex'; // Use flex for main chat layout
+            if(signOutButton) signOutButton.style.display = 'inline-block'; // Show Sign Out btn
+
             console.log("User signed in:", user);
-            initializeAppState();
+            initializeAppState(); // Initialize app state AFTER sign-in
+
         } catch (error) {
-             console.error("Error during sign-in update:", error);
+             console.error("Error getting user info or during sign-in update:", error);
              if(authStatusDiv) authStatusDiv.textContent = `Signed in, but error: ${error.message || 'Unknown error'}`;
+             // Reset to signed-out state visually on error
              authSectionDiv.style.display = 'block';
              chatUiDiv.style.display = 'none';
              if(signOutButton) signOutButton.style.display = 'none';
@@ -54,47 +65,59 @@ async function updateUiForAuthState(isSignedIn) {
     } else {
          if(authStatusDiv) authStatusDiv.textContent = 'Not signed in. Please sign in to use the chat.';
          authSectionDiv.style.display = 'block';
-         if(signInButton) { signInButton.disabled = false; signInButton.textContent = 'Sign In with Puter'; }
+         if(signInButton) {
+              signInButton.disabled = false;
+              signInButton.textContent = 'Sign In with Puter';
+         }
          chatUiDiv.style.display = 'none';
-         if(signOutButton) signOutButton.style.display = 'none';
-         isChatInitialized = false;
+         if(signOutButton) signOutButton.style.display = 'none'; // Hide Sign Out btn
+         isChatInitialized = false; // Reset chat init flag on sign out
     }
 }
 
 // --- Sign In/Out Listeners ---
-if (signInButton) { signInButton.addEventListener('click', async () => { /* ... as before ... */
-    console.log("Sign in button clicked");
-    if(authStatusDiv) authStatusDiv.textContent = 'Attempting sign in...';
-    signInButton.disabled = true; signInButton.textContent = 'Signing in...';
-    try {
-        if (typeof puter === 'undefined' || !puter.auth) throw new Error("Puter SDK or auth module not available.");
-        const signedIn = await puter.auth.signIn();
-        console.log("puter.auth.signIn() completed. Result:", signedIn);
-        await updateUiForAuthState(Boolean(signedIn));
-    } catch (error) {
-        console.error("Error during puter.auth.signIn() call:", error);
-        if(authStatusDiv) authStatusDiv.textContent = `Sign in error: ${error.message || 'Unknown error'}`;
-        signInButton.disabled = false; signInButton.textContent = 'Sign In with Puter';
-        await updateUiForAuthState(false);
-    }
-}); } else { console.error("Sign In button not found!"); }
+if (signInButton) {
+    signInButton.addEventListener('click', async () => {
+        console.log("Sign in button clicked");
+        if(authStatusDiv) authStatusDiv.textContent = 'Attempting sign in...';
+        signInButton.disabled = true; signInButton.textContent = 'Signing in...';
+        try {
+            if (typeof puter === 'undefined' || !puter.auth) throw new Error("Puter SDK or auth module not available.");
+            const signedIn = await puter.auth.signIn(); //
+            console.log("puter.auth.signIn() completed. Result:", signedIn);
+            await updateUiForAuthState(Boolean(signedIn));
+        } catch (error) {
+            console.error("Error during puter.auth.signIn() call:", error);
+            if(authStatusDiv) authStatusDiv.textContent = `Sign in error: ${error.message || 'Unknown error'}`;
+            signInButton.disabled = false; signInButton.textContent = 'Sign In with Puter';
+            await updateUiForAuthState(false);
+        }
+    });
+} else {
+    console.error("Sign In button (#signin-button) not found!");
+}
 
-if (signOutButton) { signOutButton.addEventListener('click', () => { /* ... as before ... */
-    console.log("Sign out button clicked");
-    try {
-        if (typeof puter === 'undefined' || !puter.auth) throw new Error("Puter SDK or auth module not available.");
-        puter.auth.signOut();
-        updateUiForAuthState(false);
-        console.log("Signed out called. UI updated.");
-        if (messageDisplay) messageDisplay.innerHTML = '';
-        if (chatInput) chatInput.disabled = true;
-        if (sendButton) sendButton.disabled = true;
-    } catch(error) {
-        console.error("Error during sign out:", error);
-        if(authStatusDiv) authStatusDiv.textContent = `Sign out error: ${error.message}`;
-        updateUiForAuthState(false);
-    }
-}); }
+if (signOutButton) {
+    signOutButton.addEventListener('click', () => {
+        console.log("Sign out button clicked");
+        try {
+            if (typeof puter === 'undefined' || !puter.auth) throw new Error("Puter SDK or auth module not available.");
+            puter.auth.signOut(); //
+            updateUiForAuthState(false);
+            console.log("Signed out called. UI updated.");
+            if (messageDisplay) messageDisplay.innerHTML = '';
+            if (chatInput) chatInput.disabled = true;
+            if (sendButton) sendButton.disabled = true;
+        } catch(error) {
+            console.error("Error during sign out:", error);
+            if(authStatusDiv) authStatusDiv.textContent = `Sign out error: ${error.message}`;
+            updateUiForAuthState(false);
+        }
+    });
+} else {
+     // It's okay if this isn't found immediately on load
+     // console.warn("Sign out button element (#signout-button) not found during initial load.");
+}
 
 
 // --- Phase 4: Model Selection ---
@@ -108,19 +131,10 @@ function populateModelSelector() {
     }
     console.log("Populating model selector...");
     modelSelector.innerHTML = '';
-    availableModels.forEach(modelId => { /* ... create and append options ... */
-        const option = document.createElement('option');
-        option.value = modelId; option.textContent = modelId;
-        if (modelId === selectedModel) option.selected = true;
-        modelSelector.appendChild(option);
-    });
+    availableModels.forEach(modelId => { const option = document.createElement('option'); option.value = modelId; option.textContent = modelId; if (modelId === selectedModel) option.selected = true; modelSelector.appendChild(option); });
      // Add listener only once after populating
      if (!modelSelector.getAttribute('data-listener-added')) {
-         modelSelector.addEventListener('change', (event) => {
-             selectedModel = event.target.value;
-             console.log(`Selected model changed to: ${selectedModel}`);
-             if (chatInput) chatInput.focus();
-         });
+         modelSelector.addEventListener('change', (event) => { selectedModel = event.target.value; console.log(`Selected model changed to: ${selectedModel}`); if (chatInput) chatInput.focus(); });
          modelSelector.setAttribute('data-listener-added', 'true');
          console.log("Model selector change listener added.");
      }
@@ -129,10 +143,9 @@ function populateModelSelector() {
 
 
 // --- Phase 3 & 5: Chat Logic & Display ---
-
 // *** UPDATED for Phase 5 ***
 function displayMessage(text, sender) {
-    if (!messageDisplay) { console.error("Message display area not found!"); return; }
+    if (!messageDisplay) { console.error("Message display area (#message-display) not found!"); return; }
 
     const bubble = document.createElement('div');
     bubble.classList.add('message-bubble');
@@ -155,18 +168,24 @@ function displayMessage(text, sender) {
         bubble.classList.add('user-bubble');
     } else if (sender === 'ai') {
         bubble.classList.add('ai-bubble');
-    } else {
+    } else { // System messages
          bubble.classList.add('system-bubble');
          bubble.id = text.toLowerCase().includes('thinking') ? 'loading-indicator' : '';
          // System messages might not need timestamp, remove it
-         bubble.removeChild(timestamp);
+         // Check if timestamp was actually added before removing
+         if(bubble.contains(timestamp)) {
+              bubble.removeChild(timestamp);
+         }
     }
 
     messageDisplay.appendChild(bubble);
 
     // Scroll to the bottom using smooth scrolling if available
     requestAnimationFrame(() => {
-        messageDisplay.scrollTo({ top: messageDisplay.scrollHeight, behavior: 'smooth' });
+        // Check if messageDisplay still exists in DOM before scrolling
+        if(document.body.contains(messageDisplay)) {
+            messageDisplay.scrollTo({ top: messageDisplay.scrollHeight, behavior: 'smooth' });
+        }
     });
 }
 
@@ -186,13 +205,14 @@ async function sendMessage() {
     try {
         if (typeof puter === 'undefined' || !puter.ai || !puter.ai.chat) throw new Error("Puter SDK/AI module not available.");
         console.log(`Sending (Model: ${selectedModel}): "${currentInputText}"`);
-        const response = await puter.ai.chat(currentInputText, { model: selectedModel });
+        const response = await puter.ai.chat(currentInputText, { model: selectedModel }); // Use selected model
         console.log("Received response:", response);
 
         const loadingIndicator = document.getElementById('loading-indicator');
         if(loadingIndicator && loadingIndicator.parentNode === messageDisplay) messageDisplay.removeChild(loadingIndicator);
 
         let aiText = "Sorry, couldn't get response.";
+        // Handle various response structures
         if (response && typeof response === 'string') aiText = response;
         else if (response && response.text) aiText = response.text;
         else if (response && response.message && response.message.content) aiText = response.message.content;
@@ -212,16 +232,24 @@ async function sendMessage() {
 }
 
 // --- Initialization ---
-
-function initializeChatListeners() { // Renamed
+function initializeChatListeners() {
     console.log("Attempting to initialize chat listeners.");
-    if (!chatInput || !sendButton || !messageDisplay) { setTimeout(initializeChatListeners, 200); return false; }
-    if (isChatInitialized) { console.log("Listeners already initialized."); chatInput.disabled = false; sendButton.disabled = false; if(document.body.contains(chatInput)) chatInput.focus(); return true; }
+    if (!chatInput || !sendButton || !messageDisplay) {
+        console.warn("Chat elements not ready for listener init. Retrying.");
+        setTimeout(initializeChatListeners, 200); // Retry
+        return false;
+    }
+    if (isChatInitialized) {
+        console.log("Listeners already initialized.");
+        chatInput.disabled = false; sendButton.disabled = false;
+        if(document.body.contains(chatInput)) chatInput.focus();
+        return true;
+    }
 
     console.log("Adding chat event listeners.");
     sendButton.addEventListener('click', sendMessage);
     chatInput.addEventListener('keypress', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); } });
-    chatInput.addEventListener('input', () => { /* ... height adjustment ... */
+    chatInput.addEventListener('input', () => { // Auto-resize textarea
          chatInput.style.height = 'auto'; let scrollHeight = chatInput.scrollHeight; let maxHeight = 100;
          if (scrollHeight > maxHeight) scrollHeight = maxHeight;
          chatInput.style.height = Math.max(30, scrollHeight) + 'px';
@@ -238,11 +266,11 @@ function initializeAppState() {
      console.log("Initializing app state (populating models, setting up chat).");
      populateModelSelector();
      initializeChatListeners();
+     // Phase 6 logic (initializeBannerAndPopups) is NOT included here yet
 }
 
 async function initialAuthCheck() {
-    // ... (keep implementation as before) ...
-     if (typeof puter === 'undefined' || !puter.auth || !puter.auth.isSignedIn) { console.warn("Puter SDK not ready, retrying..."); setTimeout(initialAuthCheck, 100); return; }
+    if (typeof puter === 'undefined' || !puter.auth || !puter.auth.isSignedIn) { console.warn("Puter SDK not ready, retrying..."); setTimeout(initialAuthCheck, 100); return; }
      console.log("Performing initial auth check...");
      try {
          const isSignedIn = puter.auth.isSignedIn();
