@@ -372,24 +372,21 @@ function createActionButton(title, iconClass) {
 }
 
 async function sendMessage() {
+    if (!requireSignIn()) return;
     if (!chatInput || !sendButton || !messageDisplay) { console.error("Chat UI elements missing!"); return; }
     const inputText = chatInput.value.trim();
     if (inputText === '') return;
     const currentInputText = inputText;
-    // Ensure selectedModel is valid before sending
     if (!allowedModels.includes(selectedModel)) {
-        // If the selected model was removed via settings, try falling back to default or first allowed
         const fallbackModel = allowedModels.includes('gpt-4o-mini') ? 'gpt-4o-mini' : (allowedModels[0] || null);
         if (fallbackModel) {
-            console.warn(`Selected model "${selectedModel}" not allowed, falling back to "${fallbackModel}".`);
             selectedModel = fallbackModel;
-            if (modelSelector) modelSelector.value = selectedModel; // Update dropdown visually
+            if (modelSelector) modelSelector.value = selectedModel;
         } else {
-             displayMessage(`Error: No valid AI models are enabled in settings.`, 'system');
-             return; // Can't send if no models are allowed
+            displayMessage(`Error: No valid AI models are enabled in settings.`, 'system');
+            return;
         }
     }
-
     displayMessage(currentInputText, 'user');
     chatInput.value = '';
     chatInput.disabled = true;
@@ -399,9 +396,7 @@ async function sendMessage() {
     displayMessage(`AI (${selectedModel}) is thinking...`, 'system');
     try {
         if (typeof puter === 'undefined' || !puter.ai?.chat) throw new Error("Puter chat not available.");
-        console.log(`Sending (Model: ${selectedModel}): "${currentInputText}"`);
         const response = await puter.ai.chat(currentInputText, { model: selectedModel });
-        console.log("Received response:", response);
         const loadingIndicator = document.getElementById('loading-indicator');
         if (loadingIndicator) messageDisplay.removeChild(loadingIndicator);
         let aiText = "Sorry, couldn't get response.";
@@ -412,11 +407,13 @@ async function sendMessage() {
         else console.warn("Unexpected response structure:", response);
         displayMessage(aiText, 'ai');
     } catch (error) {
-        console.error("sendMessage error:", error);
         const loadingIndicator = document.getElementById('loading-indicator');
         if (loadingIndicator) messageDisplay.removeChild(loadingIndicator);
-        displayMessage(`Error: ${error.message || 'Unknown error'}`, 'system');
-        if (error?.error?.message?.includes("insufficient funds")) displayMessage("Insufficient Puter credits.", 'system');
+        let msg = error?.error?.message || error.message || 'Unknown error';
+        if (msg.includes('Permission denied') || msg.includes('usage-limited-chat')) {
+            msg = 'You do not have permission or have exceeded your usage limit. Please check your account.';
+        }
+        displayMessage(`Error: ${msg}`, 'system');
     } finally {
         chatInput.disabled = false;
         sendButton.disabled = false;
@@ -488,34 +485,32 @@ async function speakMessage(text, buttonElement = null) {
 
 // --- Phase 6: Popup Handling ---
 // ... (showPopup, closeActivePopup remain the same) ...
-function showPopup(popupId) {
+async function showPopup(popupId) {
     const popup = popups[popupId];
-    if (popup && popupBackdrop) {
-        closeActivePopup(); // Close any existing popup first
-        popup.style.display = 'flex'; // Use flex display for popups
-        popupBackdrop.style.display = 'block';
-        activePopup = popup;
-        console.log(`Showing popup: ${popupId}`);
-        // Dispatch a custom event when shown, allowing specific initializers to run
-        popup.dispatchEvent(new CustomEvent('show'));
-    } else {
-        console.error(`Popup element '${popupId}' or backdrop missing.`);
+    if (!popup || !popupBackdrop) { console.error('Popup or backdrop missing:', popupId); return; }
+    // Always re-initialize listeners and content for reliability
+    switch (popupId) {
+        case 'history': displayChatHistory(); break;
+        case 'imgGen': initializeImageGenPopup(); break;
+        case 'ocr': initializeOcrPopup(); break;
+        case 'vision': initializeVisionPopup(); break;
+        case 'tts': initializeTTSListeners(); break;
+        case 'settings': initializeSettingsPopup(); break;
     }
+    // Set display:flex for proper layout
+    popup.style.display = 'flex';
+    popupBackdrop.style.display = 'block';
+    activePopup = popup;
 }
 
 function closeActivePopup() {
-    // Stop any active processes related to popups
     if (isTTSDictating) stopTTSDictation();
     if (visionStream) stopVisionCamera();
-
-    // Close the popup and backdrop
     if (activePopup && popupBackdrop) {
         activePopup.style.display = 'none';
         popupBackdrop.style.display = 'none';
-        console.log(`Closing popup: ${activePopup.id}`);
         activePopup = null;
     }
-    // Also ensure the image modal is closed if open
     closeImageModal();
 }
 
@@ -553,19 +548,18 @@ async function startNewChat() {
 }
 
 async function displayChatHistory() {
+    if (!requireSignIn()) return;
     if (!historyList) { console.error("History list missing."); return; }
     historyList.innerHTML = '<p>Loading...</p>';
     try {
         if (!puter.kv) throw new Error("KV missing.");
-        console.log("Fetching history keys...");
-        const keys = await puter.kv.list(historyKeyPrefix + '*'); //
-        if (!keys || keys.length === 0) { //
+        const keys = await puter.kv.list(historyKeyPrefix + '*');
+        if (!keys || keys.length === 0) {
             historyList.innerHTML = '<p>No history found.</p>';
             return;
         }
-        // Sort keys descending by timestamp (newest first)
         const sortedKeys = keys.sort((a, b) => parseInt(b.substring(historyKeyPrefix.length)) - parseInt(a.substring(historyKeyPrefix.length)));
-        historyList.innerHTML = ''; // Clear loading message
+        historyList.innerHTML = '';
         sortedKeys.forEach(key => {
             const timestamp = parseInt(key.substring(historyKeyPrefix.length));
             const dateString = new Date(timestamp).toLocaleString();
@@ -582,15 +576,14 @@ async function displayChatHistory() {
             delBtn.style.marginLeft = '5px';
             delBtn.style.color = 'red';
             delBtn.onclick = (e) => {
-                e.stopPropagation(); // Prevent loading when clicking delete
+                e.stopPropagation();
                 if (confirm(`Delete chat from ${dateString}?`)) deleteChatHistory(key, itemDiv);
             };
             itemDiv.append(infoSpan, loadBtn, delBtn);
             historyList.appendChild(itemDiv);
         });
     } catch (error) {
-        console.error("Error fetching history:", error);
-        historyList.innerHTML = '<p>Error loading history.</p>';
+        historyList.innerHTML = `<p>Error loading history: ${error.message}</p>`;
     }
 }
 
@@ -861,6 +854,7 @@ function stopChatMicRecording() {
 // ... (handleStoryGeneration, handleStoryDownload, handleCardImageGeneration, handleCardImageSearch, displayCardImageThumbnail, selectCardImage, handleCardGeneration, handleCardDownload, handleComicGeneration, handleComicDownload remain the same)
 // ... (initializeImageGenPopup remains the same)
 async function handleBasicImageGeneration() {
+    if (!requireSignIn()) return;
     if (!imgGenPrompt || !imgGenGenerateBtn || !imgGenResults || !imgGenLoading || !imgGenError) {
         console.error("Img Gen Basic UI elements missing!"); return;
     }
@@ -869,18 +863,14 @@ async function handleBasicImageGeneration() {
     imgGenGenerateBtn.disabled = true;
     imgGenError.style.display = 'none';
     imgGenLoading.style.display = 'block';
-    imgGenResults.innerHTML = ''; // Clear previous basic results
+    imgGenResults.innerHTML = '';
     try {
         if (typeof puter === 'undefined' || !puter.ai?.txt2img) throw new Error("txt2img missing.");
-        console.log("Requesting img gen (Basic):", prompt);
-        // testMode=true to avoid charges during testing
-        const imageElement = await puter.ai.txt2img(prompt, true); //
-        if (imageElement?.tagName === 'IMG') { //
-            console.log("Img generated.");
-            displayGeneratedImage(imageElement, prompt, imgGenResults); // Display in basic results area
+        const imageElement = await puter.ai.txt2img(prompt, true);
+        if (imageElement?.tagName === 'IMG') {
+            displayGeneratedImage(imageElement, prompt, imgGenResults);
         } else { throw new Error("Invalid image element returned."); }
     } catch (error) {
-        console.error("Error generating image:", error);
         imgGenError.textContent = `Error: ${error.message || 'Unknown'}`;
         imgGenError.style.display = 'block';
     } finally {
@@ -1334,12 +1324,12 @@ async function handleOcrExtract() {
     ocrStatus.style.display = 'block'; ocrResultText.value = '';
     try {
         if (typeof puter === 'undefined' || !puter.ai?.img2txt) throw new Error("img2txt missing.");
-        // Pass the file object directly if supported, otherwise use data URL
+        // Always convert file to data URL for compatibility
+        const dataUrl = await fileToDataURL(ocrSelectedFile);
         console.log(`Requesting OCR for file: ${ocrSelectedFile.name}`);
         ocrStatus.textContent = 'Extracting text...';
-        // Use File object directly
-        const extractedText = await puter.ai.img2txt(ocrSelectedFile); //
-        if (typeof extractedText === 'string') { //
+        const extractedText = await puter.ai.img2txt(dataUrl); // Use data URL
+        if (typeof extractedText === 'string') {
             ocrResultText.value = extractedText;
             ocrCopyBtn.disabled = !extractedText;
             ocrStatus.style.display = 'none';
@@ -1636,10 +1626,32 @@ function applyUISettings(settings) {
      if (!settings) return;
      currentUISettings = settings; // Update state
 
-     // Apply Theme (Simple example: add/remove class on body)
-     document.body.classList.remove('theme-light', 'theme-dark'); // Remove existing
+     // Remove all theme classes
+     document.body.classList.remove('theme-light', 'theme-dark', 'theme-grey', 'theme-sunset');
      document.body.classList.add(`theme-${settings.theme || 'light'}`);
      console.log(`Applied theme: ${settings.theme || 'light'}`);
+
+     // Apply CSS variables for dark mode
+     if ((settings.theme || 'light') === 'dark') {
+         document.body.style.setProperty('--background-color', '#181a1b');
+         document.body.style.setProperty('--foreground-color', '#e8eaed');
+         document.body.style.setProperty('--primary-color', '#23272a');
+         document.body.style.setProperty('--secondary-color', '#2c2f33');
+         document.body.style.setProperty('--accent-color', '#7289da');
+         document.body.style.setProperty('--border-color', '#444950');
+         document.body.style.setProperty('--input-bg', '#23272a');
+         document.body.style.setProperty('--input-fg', '#e8eaed');
+     } else {
+         // Reset to default (light) theme variables
+         document.body.style.setProperty('--background-color', '');
+         document.body.style.setProperty('--foreground-color', '');
+         document.body.style.setProperty('--primary-color', '');
+         document.body.style.setProperty('--secondary-color', '');
+         document.body.style.setProperty('--accent-color', '');
+         document.body.style.setProperty('--border-color', '');
+         document.body.style.setProperty('--input-bg', '');
+         document.body.style.setProperty('--input-fg', '');
+     }
 
      // Apply Text Size (Using CSS variable on body)
      const multiplier = (settings.textSize || 100) / 100;
@@ -1834,3 +1846,141 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof puter !== 'undefined') initialAuthCheck();
     else { console.warn("SDK delay."); setTimeout(initialAuthCheck, 300); }
 });
+
+// First, let's create a function to lazy load popup modules
+function lazyLoadPopupModule(popupId) {
+    let modulePromise;
+    switch(popupId) {
+        case 'imgGen':
+            modulePromise = import('./modules/imageGeneration.js');
+            break;
+        case 'ocr':
+            modulePromise = import('./modules/ocr.js');
+            break;
+        case 'vision': 
+            modulePromise = import('./modules/vision.js');
+            break;
+        case 'tts':
+            modulePromise = import('./modules/tts.js');
+            break;
+        case 'settings':
+            modulePromise = import('./modules/settings.js');
+            break;
+    }
+    return modulePromise;
+}
+
+// Cache DOM elements on load
+const UI = {
+    elements: new Map(),
+    init() {
+        // Cache all frequently used elements
+        const elements = [
+            'chat-input', 'send-button', 'message-display',
+            'model-selector', 'auth-section', 'chat-ui',
+            // ... other element IDs
+        ];
+        elements.forEach(id => {
+            this.elements.set(id, document.getElementById(id));
+        });
+    },
+    get(id) {
+        return this.elements.get(id);
+    }
+};
+
+// Use event delegation for message actions
+messageDisplay.addEventListener('click', (e) => {
+    const action = e.target.closest('.action-button');
+    if (!action) return;
+    
+    const messageContent = action.closest('.message-bubble')
+        .querySelector('.message-content').textContent;
+        
+    switch(action.title) {
+        case 'Resend': resendMessage(messageContent); break;
+        case 'Copy': copyMessage(messageContent); break;
+        case 'Delete': deleteMessage(action.closest('.message-bubble')); break;
+        case 'Speak': speakMessage(messageContent, action); break;
+    }
+});
+
+const AppSettings = {
+    cache: new Map(),
+    async load(key) {
+        if (this.cache.has(key)) return this.cache.get(key);
+        
+        const value = await puter.kv.get(key);
+        if (value) {
+            this.cache.set(key, JSON.parse(value));
+            return this.cache.get(key);
+        }
+        return null;
+    },
+    async save(key, value) {
+        this.cache.set(key, value);
+        await puter.kv.set(key, JSON.stringify(value));
+    }
+};
+
+function optimizeImage(dataUrl, maxWidth = 800) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > maxWidth) {
+                height = (maxWidth * height) / width;
+                width = maxWidth;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        img.src = dataUrl;
+    });
+}
+
+const Performance = {
+    marks: new Map(),
+    start(id) {
+        this.marks.set(id, performance.now());
+    },
+    end(id) {
+        const start = this.marks.get(id);
+        if (start) {
+            const duration = performance.now() - start;
+            console.debug(`${id} took ${duration.toFixed(2)}ms`);
+            this.marks.delete(id);
+            return duration;
+        }
+    }
+};
+
+// In the settingsThemeSelect dropdown, ensure 'dark' option is present
+if (settingsThemeSelect && !settingsThemeSelect.querySelector('option[value="dark"]')) {
+    const darkOption = document.createElement('option');
+    darkOption.value = 'dark';
+    darkOption.textContent = 'Dark';
+    settingsThemeSelect.appendChild(darkOption);
+}
+
+// --- Sign In Guard ---
+function requireSignIn() {
+    if (typeof puter === 'undefined' || !puter.auth?.isSignedIn) {
+        alert('Puter SDK not loaded.');
+        return false;
+    }
+    if (!puter.auth.isSignedIn()) {
+        alert('You must be signed in to use this feature.');
+        return false;
+    }
+    return true;
+}

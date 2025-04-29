@@ -1,9 +1,17 @@
 📦AIAIAI
  ┣ 📂API
- ┃ ┣ 📜PuterAuth.txt
- ┃ ┗ 📜puterAPI.txt
+ ┃ ┣ 📜puterAPI.txt
+ ┃ ┗ 📜PuterAuth.txt
+ ┣ 📂modules
+ ┃ ┣ 📜imageGeneration.js
+ ┃ ┣ 📜ocr.js
+ ┃ ┣ 📜settings.js
+ ┃ ┣ 📜tts.js
+ ┃ ┗ 📜vision.js
+ ┣ 📜app-tree.md
+ ┣ 📜index.html
+ ┣ 📜plan.md
  ┣ 📜PRD.md
  ┣ 📜README.md
- ┣ 📜index.html
  ┣ 📜script.js
  ┗ 📜style.css
