@@ -2,10 +2,10 @@
 body {
     font-family: sans-serif;
    }
-   
-  
-   
-  
+
+
+
+
    /* --- Phase 2: UI Elements --- */
    #header-container {
     padding: 5px;
@@ -13,8 +13,8 @@ body {
     background-color: #f8f8f8;
     min-height: 30px; /* Ensure it's visible */
    }
-   
-  
+
+
    #message-display {
     height: 400px; /* Example height */
     border: 1px solid #ccc;
@@ -23,16 +23,16 @@ body {
     padding: 10px;
     background-color: #fff;
    }
-   
-  
+
+
    #input-area {
     display: flex; /* Arrange items horizontally */
     padding: 10px;
     border-top: 1px solid #ccc;
     background-color: #f8f8f8;
    }
-   
-  
+
+
    #input-area {
     display: flex; /* Arrange items horizontally */
     align-items: center; /* Align items vertically */
@@ -40,8 +40,8 @@ body {
     border-top: 1px solid #ccc;
     background-color: #f8f8f8;
    }
-   
-  
+
+
    #mic-button, #send-button {
     background-color: #007bff;
     color: white;
@@ -53,13 +53,13 @@ body {
     font-size: 1.2em; /* Adjust icon size */
     line-height: 1; /* Ensure button height matches icon */
    }
-   
-  
+
+
    #mic-button:hover, #send-button:hover {
     background-color: #0056b3;
    }
-   
-  
+
+
    /* Phase 10: Style for main mic button when recording */
    #mic-button.recording {
        background-color: #dc3545; /* Red indicator */
@@ -67,8 +67,8 @@ body {
    #mic-button.recording:hover {
        background-color: #c82333; /* Darker red on hover */
    }
-   
-  
+
+
    #chat-input {
     flex-grow: 1; /* Allow textarea to take up remaining space */
     border: 1px solid #ccc;
@@ -80,10 +80,10 @@ body {
     max-height: 100px; /* Optional: Limit max height */
     overflow-y: auto; /* Add scroll if text exceeds max-height */
    }
-   
-  
-   
-  
+
+
+
+
    /* --- Sign Out Button Style --- */
    #signout-button {
     padding: 5px 10px;
@@ -98,8 +98,8 @@ body {
    #signout-button:hover {
     background-color: #5a6268;
    }
-   
-  
+
+
    /* --- Header Content Layout --- */
    .header-content {
     display: flex;
@@ -111,14 +111,12 @@ body {
     color: #888;
     /* Add more styling as needed */
    }
-   
-  
+
+
    /* --- Chat UI Layout --- */
    #chat-ui {
     display: flex; /* Use flexbox for main layout */
     flex-direction: column; /* Stack elements vertically */
-    /* Adjust height dynamically, avoid fixed VH units which can be tricky */
-    /* Consider setting a max-height or letting it grow */
     height: 60vh; /* Example starting height */
     min-height: 300px;
     border: 1px solid #eee;
@@ -127,69 +125,68 @@ body {
     background-color: #fff; /* Background for the whole chat area */
     margin-top: 15px;
    }
-   
-  
+
+
    #message-display {
     flex-grow: 1; /* Take up remaining vertical space */
     overflow-y: auto; /* Keep scrolling */
     padding: 15px; /* More padding */
     background-color: #fff;
-    /* Removed flex from here, handled by bubbles */
    }
-   
-  
+
+
    /* --- Message Bubble Styles --- */
    .message-bubble {
-    padding: 10px 15px; /* Slightly more padding */
-    border-radius: 18px; /* More rounded */
-    margin-bottom: 12px; /* More spacing */
-    max-width: 75%; /* Limit bubble width */
+    padding: 10px 15px;
+    border-radius: 18px;
+    margin-bottom: 12px;
+    max-width: 75%;
     word-wrap: break-word;
-    clear: both; /* Important for float alignment */
+    clear: both;
     box-shadow: 0 2px 3px rgba(0,0,0,0.1);
     position: relative;
     display: flex;
-    flex-direction: column; /* Stack content and timestamp */
-    line-height: 1.4; /* Improve readability */
+    flex-direction: column;
+    line-height: 1.4;
    }
-   
-  
+
+
    /* Timestamp Styling */
    .timestamp {
-    font-size: 0.7em; /* Smaller timestamp */
-    color: #999; /* Default timestamp color */
+    font-size: 0.7em;
+    color: #999;
     margin-top: 5px;
-    text-align: right; /* Align timestamp to the right within bubble */
-    align-self: flex-end; /* Ensure it stays right */
+    text-align: right;
+    align-self: flex-end;
    }
-   
-  
+
+
    /* User Bubble */
    .user-bubble {
     background-color: #007bff;
     color: white;
-    margin-left: auto; /* Push bubble right */
-    float: right; /* Align bubble right */
-    border-bottom-right-radius: 5px; /* Characteristic flat corner */
+    margin-left: auto;
+    float: right;
+    border-bottom-right-radius: 5px;
    }
    .user-bubble .timestamp {
-    color: #e0e0e0; /* Lighter timestamp on dark background */
+    color: #e0e0e0;
    }
-   
-  
+
+
    /* AI Bubble */
    .ai-bubble {
-    background-color: #f1f1f1; /* Light grey */
+    background-color: #f1f1f1;
     color: #333;
-    margin-right: auto; /* Push bubble left */
-    float: left; /* Align bubble left */
-    border-bottom-left-radius: 5px; /* Characteristic flat corner */
+    margin-right: auto;
+    float: left;
+    border-bottom-left-radius: 5px;
    }
    .ai-bubble .timestamp {
-    color: #6c757d; /* Darker grey timestamp */
+    color: #6c757d;
    }
-   
-  
+
+
    /* System Message Bubble */
    .system-bubble {
     font-style: italic;
@@ -199,323 +196,279 @@ body {
     max-width: none;
     background-color: transparent;
     box-shadow: none;
-    float: none; /* Don't float system messages */
+    float: none;
     margin-bottom: 8px;
     padding: 2px 0;
-    border-radius: 0; /* No rounding needed */
+    border-radius: 0;
    }
-   
-  
-   /* Clearfix to ensure container respects floated children */
+
+
+   /* Clearfix */
    #message-display::after {
     content: "";
     clear: both;
     display: table;
    }
-   
-  
+
+
    /* --- Phase 6: Bottom Banner & Popups --- */
-   
-  
    #bottom-banner {
     display: flex;
-    justify-content: center; /* Center buttons */
+    justify-content: center;
     align-items: center;
-    padding: 5px 0; /* Less vertical padding */
-    /* background-color: transparent; */ /* User requested transparent */
-    border-top: 1px solid #eee; /* Add a subtle separator line */
-    flex-shrink: 0; /* Prevent banner from shrinking */
-    order: 2; /* Make banner appear visually before input area if both inside chat-ui */
+    padding: 5px 0;
+    border-top: 1px solid #eee;
+    flex-shrink: 0;
+    order: 2;
    }
-   
-  
-   #input-area {
-    order: 3; /* Ensure input area is last */
-   }
-   #message-display {
-    order: 1; /* Ensure message display is first */
-   }
-   
-  
+
+   #input-area { order: 3; }
+   #message-display { order: 1; }
+
+
    .banner-button {
-    background-color: #6c757d; /* Grey */
+    background-color: #6c757d;
     color: white;
     border: none;
-    border-radius: 50%; /* Make buttons circular */
-    width: 36px;  /* Fixed size for circle */
-    height: 36px; /* Fixed size for circle */
-    margin: 0 8px; /* Spacing between buttons */
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    margin: 0 8px;
     cursor: pointer;
-    font-size: 1em; /* Adjust icon size if using font icons */
+    font-size: 1em;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: background-color 0.2s ease;
    }
-   
-  
-   .banner-button:hover {
-    background-color: #5a6268; /* Darker grey on hover */
-   }
-   
-  
+   .banner-button:hover { background-color: #5a6268; }
+
+
    /* Popup Backdrop */
    .popup-backdrop {
-    position: fixed; /* Cover entire viewport */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-    z-index: 999; /* Ensure it's above main content but below popup */
-    display: none; /* Hidden by default */
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999; display: none;
    }
-   
-  
+
+
    /* Basic Popup Styling */
    .popup {
-    position: fixed; /* Position relative to viewport */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Center the popup */
-    width: 90%; /* More responsive width */
-    max-width: 600px; /* Max width */
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; max-width: 600px;
     background-color: white;
-    border: 1px solid black; /* User requested black border */
-    border-radius: 8px; /* User requested rounded border */
-    padding: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    z-index: 1000; /* Ensure popup is above backdrop */
-    display: none; /* Hidden by default */
-    max-height: 85vh; /* Limit height slightly more */
-    overflow-y: auto; /* Add scroll if content exceeds height */
+    border: 1px solid black; border-radius: 8px;
+    padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 1000; display: none;
+    max-height: 85vh; overflow-y: auto;
    }
-   
-  
    .popup h2 {
-    margin-top: 0;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+    margin-top: 0; border-bottom: 1px solid #eee;
+    padding-bottom: 10px; margin-bottom: 15px;
     font-size: 1.4em;
    }
-   
-  
-   /* Style for close buttons inside popups */
    .close-popup-btn {
-    display: block; /* Make it block level */
-    margin-top: 20px; /* Space above */
-    margin-left: auto; /* Push to right */
-    padding: 8px 15px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 5px; /* Rounded button */
+    display: block; margin-top: 20px; margin-left: auto;
+    padding: 8px 15px; background-color: #6c757d;
+    color: white; border: none; border-radius: 5px;
     cursor: pointer;
    }
-   .close-popup-btn:hover {
-    background-color: #5a6268;
-   }
-   
-  
+   .close-popup-btn:hover { background-color: #5a6268; }
+
+
    /* --- Phase 7: Message Action Buttons --- */
-   
-  
    .message-actions {
-    display: flex; /* Arrange buttons horizontally */
-    justify-content: flex-end; /* Align buttons to the right below the bubble */
-    align-items: center;
-    margin-top: 5px; /* Space between content and buttons */
-    margin-left: auto; /* Ensure it aligns right within the bubble */
-    height: 18px; /* Set a fixed height */
-    opacity: 0; /* Hidden by default */
-    transition: opacity 0.2s ease-in-out; /* Smooth fade effect */
+    display: flex; justify-content: flex-end; align-items: center;
+    margin-top: 5px; margin-left: auto; height: 18px;
+    opacity: 0; transition: opacity 0.2s ease-in-out;
    }
-   
-  
-   /* Show actions on bubble hover */
-   .message-bubble:hover .message-actions {
-    opacity: 1;
-   }
-   
-  
-   
-  
+   .message-bubble:hover .message-actions { opacity: 1; }
+
    .action-button {
-    background: none;
-    border: none;
-    color: #6c757d; /* Default grey color */
-    cursor: pointer;
-    font-size: 0.85em; /* Small icons */
-    padding: 0;
-    margin-left: 8px; /* Space between buttons */
-    line-height: 1; /* Ensure icon aligns well */
+    background: none; border: none; color: #6c757d;
+    cursor: pointer; font-size: 0.85em; padding: 0;
+    margin-left: 8px; line-height: 1;
    }
-   
-  
-   .action-button:hover {
-    color: #343a40; /* Darker on hover */
-   }
-   
-  
-   /* Specific color for user bubble actions */
-   .user-bubble .action-button {
-    color: #adb5bd; /* Lighter grey on dark background */
-   }
-   .user-bubble .action-button:hover {
-    color: #f8f9fa; /* White on hover */
-   }
-   
-  
-   /* Hide actions on system messages */
-   .system-bubble .message-actions {
-    display: none;
-   }
-   
-  
+   .action-button:hover { color: #343a40; }
+   .user-bubble .action-button { color: #adb5bd; }
+   .user-bubble .action-button:hover { color: #f8f9fa; }
+   .system-bubble .message-actions { display: none; }
+
+
    /* --- Phase 9: TTS Popup Styling --- */
-   
-  
    #tts-input-area {
-    display: flex;
-    flex-direction: column; /* Stack input and buttons */
-    align-items: flex-start; /* Left-align items */
-    margin-bottom: 10px;
+    display: flex; flex-direction: column;
+    align-items: flex-start; margin-bottom: 10px;
    }
-   
-  
    #tts-text-input {
-    width: 100%; /* Full width */
-    box-sizing: border-box; /* Include padding/border in width */
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 8px;
-    font-size: 1em;
-    resize: vertical;
-    min-height: 60px; /* Larger input area */
-    max-height: 150px;
-    overflow-y: auto;
-    margin-bottom: 8px; /* Space between input and buttons */
+    width: 100%; box-sizing: border-box; border: 1px solid #ccc;
+    border-radius: 5px; padding: 8px; font-size: 1em;
+    resize: vertical; min-height: 60px; max-height: 150px;
+    overflow-y: auto; margin-bottom: 8px;
    }
-   
-  
    #tts-controls {
-    display: flex;
-    justify-content: center; /* Center the buttons */
-    align-items: center;
-    width: 100%; /* Make control area take full width */
+    display: flex; justify-content: center; /* Centered buttons */
+    align-items: center; width: 100%;
    }
-   
-  
    #tts-send-button, #tts-mic-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 1.1em; /* Slightly larger icon */
-    margin: 0 8px; /* Space around buttons */
-    width: 40px; /* Fixed width */
-    height: 40px; /* Fixed height */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-color: #007bff; color: white; border: none;
+    border-radius: 5px; padding: 8px 12px; cursor: pointer;
+    font-size: 1.1em; margin: 0 8px; width: 40px; height: 40px;
+    display: flex; justify-content: center; align-items: center;
    }
-   
-  
-   /* Style for TTS mic button when recording */
-   #tts-mic-button.recording {
-     background-color: #dc3545; /* Red */
-   }
-   #tts-mic-button.recording:hover {
-     background-color: #c82333; /* Darker Red */
-   }
-   
-  
-   #tts-send-button:hover, #tts-mic-button:hover {
-    background-color: #0056b3;
-   }
-   
-  
-   /* Style for the generated speech/audio output area */
+   #tts-mic-button.recording { background-color: #dc3545; }
+   #tts-mic-button.recording:hover { background-color: #c82333; }
+   #tts-send-button:hover, #tts-mic-button:hover { background-color: #0056b3; }
+
    #tts-output-area {
-    margin-top: 5px;
-    max-height: 200px; /* Limit height */
-    overflow-y: auto; /* Add scrollbar if needed */
-    border: 1px solid #eee; /* Subtle border */
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9; /* Slightly different background */
+    margin-top: 5px; max-height: 200px; overflow-y: auto;
+    border: 1px solid #eee; padding: 10px; border-radius: 5px;
+    background-color: #f9f9f9;
    }
-   
-  
-   /* Style for individual generated speech entries */
    .tts-entry {
-    display: flex; /* Align text and button */
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;
-    border-bottom: 1px solid #ddd; /* Separator */
-    margin-bottom: 5px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px; border-bottom: 1px solid #ddd; margin-bottom: 5px;
    }
-   
-  
-   .tts-entry:last-child {
-    border-bottom: none; /* Remove border for last item */
-   }
-   
-  
+   .tts-entry:last-child { border-bottom: none; }
    .tts-entry-text {
-    flex-grow: 1; /* Allow text to take up space */
-    margin-right: 10px; /* Space between text and button */
-    font-size: 0.95em;
-    word-break: break-word; /* Wrap long text */
+    flex-grow: 1; margin-right: 10px; font-size: 0.95em;
+    word-break: break-word;
    }
-   
-  
    .tts-replay-button {
-    background-color: #28a745; /* Green */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px; /* Smaller padding */
-    cursor: pointer;
-    font-size: 0.85em;
-    white-space: nowrap; /* Prevent button text wrapping */
-    flex-shrink: 0; /* Prevent button shrinking */
+    background-color: #28a745; color: white; border: none;
+    border-radius: 4px; padding: 4px 8px; cursor: pointer;
+    font-size: 0.85em; white-space: nowrap; flex-shrink: 0;
    }
-   
-  
-   .tts-replay-button:hover {
-    background-color: #218838; /* Darker green */
-   }
-   
-  
-   .tts-replay-button i { /* Style for potential icon */
-    margin-right: 3px;
-   }
-   
-  
-   /* Style for recorded audio entries */
+   .tts-replay-button:hover { background-color: #218838; }
+   .tts-replay-button i { margin-right: 3px; }
+
    .tts-audio-entry {
-       display: flex;
-       align-items: center;
-       padding: 5px 0;
-       border-bottom: 1px dotted #ccc;
-       margin-bottom: 5px;
+       display: flex; align-items: center; padding: 5px 0;
+       border-bottom: 1px dotted #ccc; margin-bottom: 5px;
    }
-   .tts-audio-entry:last-child {
-       border-bottom: none;
-   }
-   .tts-audio-entry audio { /* Style the HTML audio player */
-       flex-grow: 1;
-       height: 40px; /* Adjust player height */
-   }
+   .tts-audio-entry:last-child { border-bottom: none; }
+   .tts-audio-entry audio { flex-grow: 1; height: 40px; }
    .tts-audio-timestamp {
-       font-size: 0.75em;
-       color: #666;
-       margin-left: 10px;
-       white-space: nowrap;
-       flex-shrink: 0;
+       font-size: 0.75em; color: #666; margin-left: 10px;
+       white-space: nowrap; flex-shrink: 0;
    }
+
+
+   /* --- Phase 11: Image Generation Popup --- */
+   #img-gen-modes {
+       display: flex;
+       border-bottom: 1px solid #ccc;
+       margin-bottom: 15px;
+   }
+   .img-gen-mode-btn {
+       padding: 8px 15px;
+       border: none;
+       background-color: transparent;
+       cursor: pointer;
+       border-bottom: 3px solid transparent; /* For active state */
+       margin-bottom: -1px; /* Overlap border */
+       color: #6c757d;
+   }
+   .img-gen-mode-btn.active {
+       border-bottom-color: #007bff;
+       color: #007bff;
+       font-weight: bold;
+   }
+   .img-gen-mode-btn:disabled {
+       color: #ccc;
+       cursor: not-allowed;
+   }
+
+   #img-gen-prompt {
+       width: 100%;
+       box-sizing: border-box;
+       min-height: 60px;
+       margin-bottom: 10px;
+       padding: 8px;
+       border: 1px solid #ccc;
+       border-radius: 4px;
+       resize: vertical;
+   }
+
+   #img-gen-generate-btn {
+       display: block; /* Make it block level */
+       margin: 0 auto 15px auto; /* Center with margin */
+       padding: 10px 20px;
+       background-color: #007bff;
+       color: white;
+       border: none;
+       border-radius: 5px;
+       cursor: pointer;
+       font-size: 1em;
+   }
+   #img-gen-generate-btn:hover {
+       background-color: #0056b3;
+   }
+   #img-gen-generate-btn:disabled {
+       background-color: #ccc;
+       cursor: not-allowed;
+   }
+
+
+   #img-gen-results {
+       display: grid; /* Use grid for layout */
+       grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Responsive columns */
+       gap: 10px; /* Spacing between images */
+       padding: 10px;
+       border: 1px solid #eee;
+       min-height: 100px; /* Ensure area is visible */
+       background-color: #f9f9f9;
+       border-radius: 5px;
+   }
+
+   .img-gen-thumbnail-container {
+        position: relative; /* For positioning save button */
+        line-height: 0; /* Remove extra space below image */
+   }
+
+   .img-gen-thumbnail {
+       width: 100%; /* Fill grid cell */
+       height: 100px; /* Fixed height for consistency */
+       object-fit: cover; /* Crop image nicely */
+       border: 1px solid #ddd;
+       border-radius: 4px;
+       cursor: pointer; /* Indicate clickable for zoom later */
+       display: block;
+   }
+
+   .img-gen-save-btn {
+       position: absolute;
+       bottom: 5px;
+       right: 5px;
+       background-color: rgba(0, 0, 0, 0.6);
+       color: white;
+       border: none;
+       border-radius: 50%;
+       width: 28px;
+       height: 28px;
+       cursor: pointer;
+       font-size: 0.8em;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       opacity: 0.7;
+       transition: opacity 0.2s ease;
+   }
+   .img-gen-thumbnail-container:hover .img-gen-save-btn {
+       opacity: 1;
+   }
+   .img-gen-save-btn:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+   }
+
+
+   /* Style for loading/error placeholders */
+   #img-gen-loading, #img-gen-error {
+       grid-column: 1 / -1; /* Span all columns */
+       text-align: center;
+       padding: 20px;
+       color: #666;
+   }
+   #img-gen-error { color: red; }

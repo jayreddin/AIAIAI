@@ -1,6 +1,6 @@
 <!DOCTYPE html>
  <html lang="en">
- 
+
 
  <head>
   <meta charset="UTF-8">
@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
  </head>
- 
+
 
  <body>
   <header id="header-container">
@@ -21,7 +21,7 @@
    <button id="signout-button" style="display: none;">Sign Out</button>
   </div>
   </header>
- 
+
 
   <main id="app-container">
   <h1>Puter AI Chat App</h1>
@@ -29,12 +29,12 @@
    <button id="signin-button">Sign In with Puter</button>
    <div id="auth-status">Checking sign-in status...</div>
   </div>
- 
+
 
   <div id="chat-ui" style="display: none;">
   <div id="message-display">
   </div>
- 
+
 
   <div id="bottom-banner">
    <button id="new-chat-btn" class="banner-button" title="New Chat"><i class="fas fa-plus"></i></button>
@@ -45,18 +45,19 @@
    <button id="tts-btn" class="banner-button" title="Text-to-Speech Mode"><i class="fas fa-volume-up"></i></button>
    <button id="settings-btn" class="banner-button" title="Settings"><i class="fas fa-cog"></i></button>
   </div>
- 
+
 
   <div id="input-area">
-   <button id="mic-button" title="Microphone Input">🎤</button> <textarea id="chat-input" placeholder="Type your message here..." rows="1"></textarea>
+   <button id="mic-button" title="Microphone Input">🎤</button>
+   <textarea id="chat-input" placeholder="Type your message here..." rows="1"></textarea>
    <button id="send-button" title="Send Message">➤</button>
   </div>
   </div>
   </main>
- 
+
 
   <div id="popup-backdrop" class="popup-backdrop" style="display: none;"></div>
- 
+
 
   <div id="history-popup" class="popup" style="display: none;">
   <h2>Chat History</h2>
@@ -64,10 +65,34 @@
   </div>
   <button class="close-popup-btn">Close</button>
   </div>
+
   <div id="img-gen-popup" class="popup" style="display: none;">
-  <h2>Image Generation</h2>
-  <p>[Image Gen content will go here - Phase 11]</p>
-  <button class="close-popup-btn">Close</button>
+   <h2>Image Generation</h2>
+   <div id="img-gen-content">
+       <div id="img-gen-modes">
+           <button class="img-gen-mode-btn active" data-mode="basic">Basic</button>
+           <button class="img-gen-mode-btn" data-mode="story" disabled>Story (TBD)</button>
+           <button class="img-gen-mode-btn" data-mode="card" disabled>Card (TBD)</button>
+           <button class="img-gen-mode-btn" data-mode="comic" disabled>Comic (TBD)</button>
+       </div>
+
+       <div id="img-gen-mode-ui">
+           <div id="img-gen-basic-mode">
+               <textarea id="img-gen-prompt" placeholder="Enter image prompt..." rows="3"></textarea>
+               <button id="img-gen-generate-btn">Generate</button>
+           </div>
+           <div id="img-gen-story-mode" style="display: none;">Story Mode UI TBD</div>
+           <div id="img-gen-card-mode" style="display: none;">Card Mode UI TBD</div>
+           <div id="img-gen-comic-mode" style="display: none;">Comic Mode UI TBD</div>
+       </div>
+
+       <div id="img-gen-results-heading" style="margin-top: 15px; font-weight: bold;">Results:</div>
+       <div id="img-gen-results">
+           <div id="img-gen-loading" style="display: none; text-align: center; padding: 20px;">Generating image... <i class="fas fa-spinner fa-spin"></i></div>
+           <div id="img-gen-error" style="display: none; color: red; text-align: center; padding: 10px;"></div>
+       </div>
+   </div>
+   <button class="close-popup-btn">Close</button>
   </div>
   <div id="ocr-popup" class="popup" style="display: none;">
   <h2>OCR (Image to Text)</h2>
@@ -85,7 +110,8 @@
    <textarea id="tts-text-input" placeholder="Enter text to speak"></textarea>
    <div id="tts-controls">
     <button id="tts-send-button" title="Speak Text"><i class="fas fa-play"></i></button>
-    <button id="tts-mic-button" title="Record Audio"><i class="fas fa-microphone"></i></button> </div>
+    <button id="tts-mic-button" title="Record Audio"><i class="fas fa-microphone"></i></button>
+   </div>
   </div>
   <div id="tts-output-heading" style="margin-top: 15px; font-weight: bold;">Generated Speech / Recordings:</div>
   <div id="tts-output-area" style="margin-top: 5px; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px;">
@@ -97,7 +123,7 @@
   <p>[Settings content will go here - Phase 14]</p>
   <button class="close-popup-btn">Close</button>
   </div>
- 
+
 
   <script src="https://js.puter.com/v2/"></script>
   <script src="script.js"></script>
