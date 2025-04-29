@@ -188,3 +188,88 @@ body {
     align-items: center;
     padding: 5px 10px; /* Add padding to header content */
 }
+
+/* --- Phase 5: Chat Bubble Styling --- */
+
+#message-display {
+    /* Keep existing styles like flex-grow, background-color, padding */
+    overflow-y: scroll; /* Ensure scrolling is enabled */
+    /* Hidden Scrollbar CSS */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+#message-display::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
+}
+
+
+.message-bubble {
+    padding: 10px 15px; /* Slightly more padding */
+    border-radius: 18px; /* More rounded */
+    margin-bottom: 12px; /* More spacing */
+    max-width: 75%; /* Limit bubble width */
+    word-wrap: break-word;
+    clear: both; /* Important for float alignment */
+    box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column; /* Stack content and timestamp */
+    line-height: 1.4; /* Improve readability */
+}
+
+/* Timestamp Styling */
+.timestamp {
+    font-size: 0.7em; /* Smaller timestamp */
+    color: #999; /* Default timestamp color */
+    margin-top: 5px;
+    text-align: right; /* Align timestamp to the right within bubble */
+    align-self: flex-end; /* Ensure it stays right */
+}
+
+/* User Bubble */
+.user-bubble {
+    background-color: #007bff;
+    color: white;
+    margin-left: auto; /* Push bubble right */
+    float: right; /* Align bubble right */
+    border-bottom-right-radius: 5px; /* Characteristic flat corner */
+}
+.user-bubble .timestamp {
+    color: #e0e0e0; /* Lighter timestamp on dark background */
+}
+
+/* AI Bubble */
+.ai-bubble {
+    background-color: #f1f1f1; /* Light grey */
+    color: #333;
+    margin-right: auto; /* Push bubble left */
+    float: left; /* Align bubble left */
+    border-bottom-left-radius: 5px; /* Characteristic flat corner */
+}
+.ai-bubble .timestamp {
+     color: #6c757d; /* Darker grey timestamp */
+}
+
+
+/* System Message Bubble */
+.system-bubble {
+    font-style: italic;
+    color: #6c757d;
+    text-align: center;
+    width: 100%;
+    max-width: none;
+    background-color: transparent;
+    box-shadow: none;
+    float: none; /* Don't float system messages */
+    margin-bottom: 8px;
+    padding: 2px 0;
+    border-radius: 0; /* No rounding needed */
+}
+
+/* Clearfix to ensure container respects floated children */
+#message-display::after {
+  content: "";
+  clear: both;
+  display: table;
+}
