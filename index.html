@@ -13,13 +13,18 @@
 
  <body>
   <header id="header-container">
-  <div class="header-content">
-   <label for="model-selector" style="margin-right: 5px; color: #555; font-size: 0.9em;">Model:</label>
-   <select id="model-selector">
-    <option value="">Loading Models...</option>
-   </select>
-   <button id="signout-button" style="display: none;">Sign Out</button>
-  </div>
+   <div class="header-content">
+       <div class="model-selector-container">
+           <label for="model-selector">Model:</label>
+           <select id="model-selector">
+               <option value="">Loading Models...</option>
+           </select>
+       </div>
+       <div class="user-info-container">
+           <div id="username-display" style="display: none; margin-bottom: 3px; font-size: 0.8em; color: #555;"></div>
+           <button id="signout-button" style="display: none;">Sign Out</button>
+       </div>
+   </div>
   </header>
 
 
@@ -71,26 +76,47 @@
    <div id="img-gen-content">
        <div id="img-gen-modes">
            <button class="img-gen-mode-btn active" data-mode="basic">Basic</button>
-           <button class="img-gen-mode-btn" data-mode="story" disabled>Story (TBD)</button>
-           <button class="img-gen-mode-btn" data-mode="card" disabled>Card (TBD)</button>
-           <button class="img-gen-mode-btn" data-mode="comic" disabled>Comic (TBD)</button>
+           <button class="img-gen-mode-btn" data-mode="story">Story</button>
+           <button class="img-gen-mode-btn" data-mode="card">Card</button>
+           <button class="img-gen-mode-btn" data-mode="comic">Comic</button>
        </div>
 
        <div id="img-gen-mode-ui">
-           <div id="img-gen-basic-mode">
+           <div id="img-gen-basic-mode" class="img-gen-mode-panel active">
                <textarea id="img-gen-prompt" placeholder="Enter image prompt..." rows="3"></textarea>
                <button id="img-gen-generate-btn">Generate</button>
            </div>
-           <div id="img-gen-story-mode" style="display: none;">Story Mode UI TBD</div>
-           <div id="img-gen-card-mode" style="display: none;">Card Mode UI TBD</div>
-           <div id="img-gen-comic-mode" style="display: none;">Comic Mode UI TBD</div>
+           <div id="img-gen-story-mode" class="img-gen-mode-panel">
+               <p><i>Story Mode - UI and Logic TBD</i></p>
+               <input type="text" placeholder="Character(s)...">
+               <input type="text" placeholder="Setting...">
+               <textarea placeholder="Plot Summary..." rows="3"></textarea>
+               <button disabled>Generate Story (TBD)</button>
+               <button disabled>Download PDF (TBD)</button>
+           </div>
+           <div id="img-gen-card-mode" class="img-gen-mode-panel">
+               <p><i>Card Mode - UI and Logic TBD</i></p>
+               <select> <option>Type (Birthday, Thank You...)</option> </select>
+               <textarea placeholder="Visual Description..." rows="2"></textarea>
+               <input type="text" placeholder="Recipient...">
+               <textarea placeholder="Message..." rows="2"></textarea>
+               <button disabled>Generate Card (TBD)</button>
+           </div>
+           <div id="img-gen-comic-mode" class="img-gen-mode-panel">
+                <p><i>Comic Mode - UI and Logic TBD</i></p>
+               <input type="text" placeholder="Character(s)...">
+               <input type="text" placeholder="Setting...">
+               <textarea placeholder="Plot Summary (Panel by Panel)..." rows="3"></textarea>
+               <button disabled>Generate Comic (TBD)</button>
+               <button disabled>Download PDF (TBD)</button>
+           </div>
        </div>
 
        <div id="img-gen-results-heading" style="margin-top: 15px; font-weight: bold;">Results:</div>
        <div id="img-gen-results">
            <div id="img-gen-loading" style="display: none; text-align: center; padding: 20px;">Generating image... <i class="fas fa-spinner fa-spin"></i></div>
            <div id="img-gen-error" style="display: none; color: red; text-align: center; padding: 10px;"></div>
-       </div>
+           </div>
    </div>
    <button class="close-popup-btn">Close</button>
   </div>
@@ -122,6 +148,15 @@
   <h2>Settings</h2>
   <p>[Settings content will go here - Phase 14]</p>
   <button class="close-popup-btn">Close</button>
+  </div>
+
+  <div id="image-modal-backdrop" class="popup-backdrop" style="display: none; z-index: 1001;"></div>
+  <div id="image-modal" class="popup" style="display: none; z-index: 1002; padding: 10px; max-width: 90%; max-height: 90%;">
+      <img id="expanded-image" src="#" alt="Expanded Image" style="max-width: 100%; max-height: calc(85vh - 60px); display: block; margin: 0 auto;">
+      <div id="image-modal-controls" style="text-align: center; margin-top: 10px;">
+          <button id="image-modal-save">Save</button>
+          <button id="image-modal-close">Close</button>
+      </div>
   </div>
 
 

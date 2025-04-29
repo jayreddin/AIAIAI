@@ -1,6 +1,8 @@
 /* Basic styles will go here */
 body {
     font-family: sans-serif;
+    margin: 15px; /* Add some overall margin */
+    background-color: #f0f2f5; /* Light background for body */
    }
 
 
@@ -8,20 +10,81 @@ body {
 
    /* --- Phase 2: UI Elements --- */
    #header-container {
-    padding: 5px;
+    padding: 8px 15px; /* Adjusted padding */
     border-bottom: 1px solid #ccc;
-    background-color: #f8f8f8;
-    min-height: 30px; /* Ensure it's visible */
+    background-color: #ffffff; /* White header */
+    min-height: 40px;
+    display: flex; /* Use flex for alignment */
+    align-items: center; /* Vertically align items */
+    justify-content: space-between; /* Space out items */
+    border-radius: 6px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+   }
+
+   .header-content { /* No longer needed directly on header */
+       display: flex;
+       align-items: center;
+       justify-content: space-between; /* Ensure space between groups */
+       width: 100%;
+   }
+
+   /* Container for Model Selector */
+   .model-selector-container {
+       display: flex;
+       align-items: center;
+       flex-grow: 1; /* Allow it to take space */
+       justify-content: center; /* Center label and select */
+       margin: 0 20px; /* Add margin to avoid collision */
+   }
+
+   .model-selector-container label {
+       margin-right: 8px;
+       color: #555;
+       font-size: 0.9em;
+       white-space: nowrap;
+   }
+
+   #model-selector {
+       /* Improved dropdown appearance */
+       padding: 6px 10px;
+       border: 1px solid #ccc;
+       border-radius: 4px;
+       background-color: #fff;
+       font-size: 0.9em;
+       min-width: 200px; /* Give it some base width */
+       cursor: pointer;
+       /* Consider appearance: none; for custom arrow */
+   }
+   #model-selector:focus {
+       outline: none;
+       border-color: #007bff;
+       box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+   }
+
+   /* Container for User Info */
+   .user-info-container {
+       display: flex;
+       flex-direction: column; /* Stack username and button */
+       align-items: flex-end; /* Align to the right */
+   }
+
+   #username-display {
+       font-size: 0.8em;
+       color: #555;
+       margin-bottom: 3px;
+       text-align: right;
    }
 
 
    #message-display {
-    height: 400px; /* Example height */
+    height: calc(60vh - 100px); /* Adjust height based on potential header/footer */
     border: 1px solid #ccc;
     margin-bottom: 10px;
     overflow-y: scroll; /* Enable vertical scrolling */
     padding: 10px;
     background-color: #fff;
+    border-radius: 6px;
    }
 
 
@@ -30,6 +93,7 @@ body {
     padding: 10px;
     border-top: 1px solid #ccc;
     background-color: #f8f8f8;
+    border-radius: 0 0 6px 6px; /* Round bottom corners if part of chat-ui */
    }
 
 
@@ -93,24 +157,13 @@ body {
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9em;
-    margin-left: auto; /* Pushes to the right in flex container */
+    /* margin-left: auto; Removed, handled by container */
    }
    #signout-button:hover {
     background-color: #5a6268;
    }
 
 
-   /* --- Header Content Layout --- */
-   .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-   }
-   .header-title {
-    color: #888;
-    /* Add more styling as needed */
-   }
 
 
    /* --- Chat UI Layout --- */
@@ -124,15 +177,10 @@ body {
     overflow: hidden; /* Contain children */
     background-color: #fff; /* Background for the whole chat area */
     margin-top: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
    }
 
 
-   #message-display {
-    flex-grow: 1; /* Take up remaining vertical space */
-    overflow-y: auto; /* Keep scrolling */
-    padding: 15px; /* More padding */
-    background-color: #fff;
-   }
 
 
    /* --- Message Bubble Styles --- */
@@ -354,6 +402,10 @@ body {
        font-size: 0.75em; color: #666; margin-left: 10px;
        white-space: nowrap; flex-shrink: 0;
    }
+   .tts-status { /* Style for status messages */
+       padding: 5px 0;
+       text-align: center;
+   }
 
 
    /* --- Phase 11: Image Generation Popup --- */
@@ -367,7 +419,7 @@ body {
        border: none;
        background-color: transparent;
        cursor: pointer;
-       border-bottom: 3px solid transparent; /* For active state */
+       border-bottom: 3px solid transparent;
        margin-bottom: -1px; /* Overlap border */
        color: #6c757d;
    }
@@ -379,6 +431,14 @@ body {
    .img-gen-mode-btn:disabled {
        color: #ccc;
        cursor: not-allowed;
+   }
+
+   /* Hide non-active mode panels */
+   .img-gen-mode-panel {
+       display: none;
+   }
+   .img-gen-mode-panel.active {
+       display: block;
    }
 
    #img-gen-prompt {
@@ -393,8 +453,8 @@ body {
    }
 
    #img-gen-generate-btn {
-       display: block; /* Make it block level */
-       margin: 0 auto 15px auto; /* Center with margin */
+       display: block;
+       margin: 0 auto 15px auto;
        padding: 10px 20px;
        background-color: #007bff;
        color: white;
@@ -403,72 +463,80 @@ body {
        cursor: pointer;
        font-size: 1em;
    }
-   #img-gen-generate-btn:hover {
-       background-color: #0056b3;
-   }
-   #img-gen-generate-btn:disabled {
-       background-color: #ccc;
-       cursor: not-allowed;
-   }
+   #img-gen-generate-btn:hover { background-color: #0056b3; }
+   #img-gen-generate-btn:disabled { background-color: #ccc; cursor: not-allowed; }
 
 
    #img-gen-results {
-       display: grid; /* Use grid for layout */
-       grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Responsive columns */
-       gap: 10px; /* Spacing between images */
+       display: grid;
+       grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+       gap: 10px;
        padding: 10px;
        border: 1px solid #eee;
-       min-height: 100px; /* Ensure area is visible */
+       min-height: 100px;
        background-color: #f9f9f9;
        border-radius: 5px;
    }
 
    .img-gen-thumbnail-container {
-        position: relative; /* For positioning save button */
-        line-height: 0; /* Remove extra space below image */
+        position: relative;
+        line-height: 0;
    }
 
    .img-gen-thumbnail {
-       width: 100%; /* Fill grid cell */
-       height: 100px; /* Fixed height for consistency */
-       object-fit: cover; /* Crop image nicely */
+       width: 100%;
+       height: 100px;
+       object-fit: cover;
        border: 1px solid #ddd;
        border-radius: 4px;
-       cursor: pointer; /* Indicate clickable for zoom later */
+       cursor: pointer;
        display: block;
    }
 
    .img-gen-save-btn {
        position: absolute;
-       bottom: 5px;
-       right: 5px;
+       bottom: 5px; right: 5px;
        background-color: rgba(0, 0, 0, 0.6);
-       color: white;
-       border: none;
-       border-radius: 50%;
-       width: 28px;
-       height: 28px;
-       cursor: pointer;
-       font-size: 0.8em;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       opacity: 0.7;
-       transition: opacity 0.2s ease;
+       color: white; border: none; border-radius: 50%;
+       width: 28px; height: 28px; cursor: pointer;
+       font-size: 0.8em; display: flex;
+       justify-content: center; align-items: center;
+       opacity: 0.7; transition: opacity 0.2s ease;
    }
-   .img-gen-thumbnail-container:hover .img-gen-save-btn {
-       opacity: 1;
-   }
-   .img-gen-save-btn:hover {
-        background-color: rgba(0, 0, 0, 0.8);
-   }
+   .img-gen-thumbnail-container:hover .img-gen-save-btn { opacity: 1; }
+   .img-gen-save-btn:hover { background-color: rgba(0, 0, 0, 0.8); }
 
 
-   /* Style for loading/error placeholders */
    #img-gen-loading, #img-gen-error {
-       grid-column: 1 / -1; /* Span all columns */
+       grid-column: 1 / -1;
        text-align: center;
        padding: 20px;
        color: #666;
    }
    #img-gen-error { color: red; }
+
+
+   /* Image Expansion Modal Styles */
+   #image-modal {
+       border: 1px solid #555; /* Darker border for modal */
+       background-color: #fdfdfd;
+   }
+   #image-modal-controls button {
+       padding: 8px 16px;
+       margin: 0 10px;
+       border-radius: 5px;
+       cursor: pointer;
+       border: 1px solid #ccc;
+   }
+   #image-modal-save {
+       background-color: #28a745;
+       color: white;
+       border-color: #28a745;
+   }
+   #image-modal-save:hover { background-color: #218838; }
+   #image-modal-close {
+       background-color: #6c757d;
+       color: white;
+       border-color: #6c757d;
+   }
+   #image-modal-close:hover { background-color: #5a6268; }
