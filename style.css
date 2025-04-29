@@ -29,7 +29,7 @@ body {
        width: 100%;
    }
 
-   /* Container for Model Selector */
+   /* Container for Model Selector - Centered */
    .model-selector-container {
        display: flex;
        align-items: center;
@@ -38,7 +38,7 @@ body {
        margin: 0 20px; /* Add margin to avoid collision */
    }
 
-   .model-selector-container label {
+   .model-selector-container label { /* Label is removed, but keeping style just in case */
        margin-right: 8px;
        color: #555;
        font-size: 0.9em;
@@ -53,8 +53,9 @@ body {
        background-color: #fff;
        font-size: 0.9em;
        min-width: 200px; /* Give it some base width */
+       max-width: 350px; /* Prevent it getting too wide */
        cursor: pointer;
-       /* Consider appearance: none; for custom arrow */
+       /* Add some basic styling, hiding native arrow is complex */
    }
    #model-selector:focus {
        outline: none;
@@ -67,13 +68,23 @@ body {
        display: flex;
        flex-direction: column; /* Stack username and button */
        align-items: flex-end; /* Align to the right */
+       flex-shrink: 0; /* Prevent shrinking */
    }
 
-   #username-display {
-       font-size: 0.8em;
-       color: #555;
-       margin-bottom: 3px;
+   /* Username Box */
+   .username-box {
+       font-size: 0.9em;
+       color: #333;
+       border: 1px solid #6c757d; /* Match sign out button border */
+       padding: 3px 8px;
+       border-radius: 4px;
+       margin-bottom: 4px; /* Space between username and button */
        text-align: right;
+       background-color: #f8f9fa; /* Light background */
+       white-space: nowrap; /* Prevent wrapping */
+       max-width: 150px; /* Limit width */
+       overflow: hidden;
+       text-overflow: ellipsis; /* Add ... if too long */
    }
 
 
@@ -153,7 +164,7 @@ body {
     padding: 5px 10px;
     background-color: #6c757d; /* Grey */
     color: white;
-    border: none;
+    border: 1px solid #6c757d; /* Add border */
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9em;
@@ -589,6 +600,7 @@ body {
        position: relative; /* For remove button */
        background-color: #f9f9f9;
        border-radius: 5px;
+       overflow: hidden; /* Hide overflow if image is too big */
    }
    .ocr-thumbnail-img {
        max-width: 100%;
@@ -621,11 +633,11 @@ body {
        border-radius: 5px;
        cursor: pointer;
        font-size: 1em;
+       align-self: flex-start; /* Align left */
    }
    #ocr-extract-btn {
        background-color: #28a745; /* Green */
        color: white;
-       align-self: flex-start;
    }
    #ocr-extract-btn:hover { background-color: #218838; }
    #ocr-extract-btn:disabled { background-color: #ccc; cursor: not-allowed; }
@@ -640,12 +652,13 @@ body {
        font-size: 0.95em;
        resize: vertical;
        background-color: #e9ecef; /* Indicate readonly */
+       min-height: 100px; /* Ensure decent size */
    }
 
    #ocr-copy-btn {
        background-color: #17a2b8; /* Info blue */
        color: white;
-       align-self: flex-start;
+       margin-top: -5px; /* Pull slightly closer to textarea */
    }
    #ocr-copy-btn:hover { background-color: #138496; }
    #ocr-copy-btn:disabled { background-color: #ccc; cursor: not-allowed; }
@@ -654,4 +667,78 @@ body {
    #ocr-status {
        color: #6c757d;
        font-style: italic;
+       text-align: center;
    }
+
+
+    /* --- Phase 13: Vision Popup Styling --- */
+    #vision-content {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #vision-video-container {
+        background-color: #333; /* Dark background for video */
+    }
+
+    #vision-video-preview {
+        display: block;
+        width: 100%;
+        max-height: 40vh; /* Limit video height */
+        object-fit: contain; /* Show whole video */
+    }
+
+    #vision-controls button,
+    #vision-actions button,
+    #vision-enable-cam-btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9em;
+        margin: 0 5px;
+    }
+    #vision-controls button i,
+    #vision-actions button i,
+    #vision-enable-cam-btn i {
+        margin-right: 5px;
+    }
+
+    #vision-enable-cam-btn { background-color: #007bff; color: white;}
+    #vision-enable-cam-btn:hover { background-color: #0056b3; }
+
+    #vision-describe-btn { background-color: #28a745; color: white; }
+    #vision-describe-btn:hover { background-color: #218838; }
+
+    #vision-stop-cam-btn { background-color: #dc3545; color: white; }
+    #vision-stop-cam-btn:hover { background-color: #c82333; }
+
+    #vision-results-text {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 8px;
+        font-size: 0.95em;
+        resize: vertical;
+        min-height: 80px;
+        background-color: #e9ecef; /* Readonly indicator */
+    }
+
+    #vision-actions button {
+        background-color: #6c757d;
+        color: white;
+    }
+     #vision-actions button:hover {
+        background-color: #5a6268;
+    }
+     #vision-actions button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+     #vision-status {
+        color: #6c757d;
+        font-style: italic;
+    }
