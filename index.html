@@ -67,6 +67,7 @@
   <div id="history-popup" class="popup" style="display: none;">
   <h2>Chat History</h2>
   <div id="history-list">
+      <p>Loading history...</p>
   </div>
   <button class="close-popup-btn">Close</button>
   </div>
@@ -80,7 +81,6 @@
            <button class="img-gen-mode-btn" data-mode="card">Card</button>
            <button class="img-gen-mode-btn" data-mode="comic">Comic</button>
        </div>
-
        <div id="img-gen-mode-ui">
            <div id="img-gen-basic-mode" class="img-gen-mode-panel active">
                <textarea id="img-gen-prompt" placeholder="Enter image prompt..." rows="3"></textarea>
@@ -88,42 +88,45 @@
            </div>
            <div id="img-gen-story-mode" class="img-gen-mode-panel">
                <p><i>Story Mode - UI and Logic TBD</i></p>
-               <input type="text" placeholder="Character(s)...">
-               <input type="text" placeholder="Setting...">
+               <input type="text" placeholder="Character(s)..."> <input type="text" placeholder="Setting...">
                <textarea placeholder="Plot Summary..." rows="3"></textarea>
-               <button disabled>Generate Story (TBD)</button>
-               <button disabled>Download PDF (TBD)</button>
+               <button disabled>Generate Story (TBD)</button> <button disabled>Download PDF (TBD)</button>
            </div>
            <div id="img-gen-card-mode" class="img-gen-mode-panel">
                <p><i>Card Mode - UI and Logic TBD</i></p>
                <select> <option>Type (Birthday, Thank You...)</option> </select>
-               <textarea placeholder="Visual Description..." rows="2"></textarea>
-               <input type="text" placeholder="Recipient...">
-               <textarea placeholder="Message..." rows="2"></textarea>
-               <button disabled>Generate Card (TBD)</button>
+               <textarea placeholder="Visual Description..." rows="2"></textarea> <input type="text" placeholder="Recipient...">
+               <textarea placeholder="Message..." rows="2"></textarea> <button disabled>Generate Card (TBD)</button>
            </div>
            <div id="img-gen-comic-mode" class="img-gen-mode-panel">
                 <p><i>Comic Mode - UI and Logic TBD</i></p>
-               <input type="text" placeholder="Character(s)...">
-               <input type="text" placeholder="Setting...">
+               <input type="text" placeholder="Character(s)..."> <input type="text" placeholder="Setting...">
                <textarea placeholder="Plot Summary (Panel by Panel)..." rows="3"></textarea>
-               <button disabled>Generate Comic (TBD)</button>
-               <button disabled>Download PDF (TBD)</button>
+               <button disabled>Generate Comic (TBD)</button> <button disabled>Download PDF (TBD)</button>
            </div>
        </div>
-
        <div id="img-gen-results-heading" style="margin-top: 15px; font-weight: bold;">Results:</div>
        <div id="img-gen-results">
            <div id="img-gen-loading" style="display: none; text-align: center; padding: 20px;">Generating image... <i class="fas fa-spinner fa-spin"></i></div>
            <div id="img-gen-error" style="display: none; color: red; text-align: center; padding: 10px;"></div>
-           </div>
+       </div>
    </div>
    <button class="close-popup-btn">Close</button>
   </div>
+
   <div id="ocr-popup" class="popup" style="display: none;">
-  <h2>OCR (Image to Text)</h2>
-  <p>[OCR content will go here - Phase 12]</p>
-  <button class="close-popup-btn">Close</button>
+      <h2>OCR (Image to Text)</h2>
+      <div id="ocr-content">
+          <input type="file" id="ocr-file-input" accept="image/*" style="display: none;">
+          <button id="ocr-upload-btn"><i class="fas fa-upload"></i> Upload Image</button>
+          <div id="ocr-thumbnail-area">
+              </div>
+          <button id="ocr-extract-btn" disabled><i class="fas fa-search-plus"></i> Extract Text</button>
+          <div id="ocr-status" style="text-align: center; margin: 10px 0; display: none;"></div>
+          <textarea id="ocr-result-text" placeholder="Extracted text will appear here..." rows="8" readonly></textarea>
+          <button id="ocr-copy-btn" disabled><i class="fas fa-copy"></i> Copy Text</button>
+      </div>
+      <button class="close-popup-btn">Close</button>
   </div>
   <div id="vision-popup" class="popup" style="display: none;">
   <h2>Vision</h2>
