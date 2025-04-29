@@ -1,42 +1,48 @@
 /* Basic styles will go here */
 body {
     font-family: sans-serif;
-}
-
-
-/* --- Phase 2: UI Elements --- */
-#header-container {
+   }
+   
+  
+   
+  
+   /* --- Phase 2: UI Elements --- */
+   #header-container {
     padding: 5px;
     border-bottom: 1px solid #ccc;
     background-color: #f8f8f8;
     min-height: 30px; /* Ensure it's visible */
-}
-
-#message-display {
+   }
+   
+  
+   #message-display {
     height: 400px; /* Example height */
     border: 1px solid #ccc;
     margin-bottom: 10px;
     overflow-y: scroll; /* Enable vertical scrolling */
     padding: 10px;
     background-color: #fff;
-}
-
-#input-area {
+   }
+   
+  
+   #input-area {
     display: flex; /* Arrange items horizontally */
     padding: 10px;
     border-top: 1px solid #ccc;
     background-color: #f8f8f8;
-}
-
-#input-area {
+   }
+   
+  
+   #input-area {
     display: flex; /* Arrange items horizontally */
     align-items: center; /* Align items vertically */
     padding: 10px;
     border-top: 1px solid #ccc;
     background-color: #f8f8f8;
-}
-
-#mic-button, #send-button {
+   }
+   
+  
+   #mic-button, #send-button {
     background-color: #007bff;
     color: white;
     border: none;
@@ -46,13 +52,15 @@ body {
     cursor: pointer;
     font-size: 1.2em; /* Adjust icon size */
     line-height: 1; /* Ensure button height matches icon */
-}
-
-#mic-button:hover, #send-button:hover {
+   }
+   
+  
+   #mic-button:hover, #send-button:hover {
     background-color: #0056b3;
-}
-
-#chat-input {
+   }
+   
+  
+   #chat-input {
     flex-grow: 1; /* Allow textarea to take up remaining space */
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -62,11 +70,13 @@ body {
     min-height: 30px; /* Minimum height for one line */
     max-height: 100px; /* Optional: Limit max height */
     overflow-y: auto; /* Add scroll if text exceeds max-height */
-}
-
-
-/* --- Sign Out Button Style --- */
-#signout-button {
+   }
+   
+  
+   
+  
+   /* --- Sign Out Button Style --- */
+   #signout-button {
     padding: 5px 10px;
     background-color: #6c757d; /* Grey */
     color: white;
@@ -75,25 +85,27 @@ body {
     cursor: pointer;
     font-size: 0.9em;
     margin-left: auto; /* Pushes to the right in flex container */
-}
-#signout-button:hover {
+   }
+   #signout-button:hover {
     background-color: #5a6268;
-}
-
-/* --- Header Content Layout --- */
-.header-content {
+   }
+   
+  
+   /* --- Header Content Layout --- */
+   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-}
-.header-title {
-     color: #888;
-     /* Add more styling as needed */
-}
-
-/* --- Chat UI Layout --- */
-#chat-ui {
+   }
+   .header-title {
+    color: #888;
+    /* Add more styling as needed */
+   }
+   
+  
+   /* --- Chat UI Layout --- */
+   #chat-ui {
     display: flex; /* Use flexbox for main layout */
     flex-direction: column; /* Stack elements vertically */
     /* Adjust height dynamically, avoid fixed VH units which can be tricky */
@@ -105,106 +117,20 @@ body {
     overflow: hidden; /* Contain children */
     background-color: #fff; /* Background for the whole chat area */
     margin-top: 15px;
-}
-
-#message-display {
+   }
+   
+  
+   #message-display {
     flex-grow: 1; /* Take up remaining vertical space */
     overflow-y: auto; /* Keep scrolling */
     padding: 15px; /* More padding */
     background-color: #fff;
     /* Removed flex from here, handled by bubbles */
-}
-
-/* --- Message Bubble Styles --- */
-.message-bubble {
-    padding: 8px 12px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    max-width: 80%;
-    word-wrap: break-word;
-    clear: both; /* Important for float alignment */
-    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-    /* Ensure bubbles don't prevent scrolling */
-    position: relative;
-}
-
-.user-bubble {
-    background-color: #007bff;
-    color: white;
-    margin-left: auto; /* Push right */
-    float: right; /* Align right */
-    text-align: left; /* Keep text left-aligned inside bubble */
-}
-
-.ai-bubble {
-    background-color: #e9ecef;
-    color: #333;
-    margin-right: auto; /* Push left */
-    float: left; /* Align left */
-}
-
-.system-bubble {
-    font-style: italic;
-    color: #6c757d;
-    text-align: center;
-    width: 100%;
-    max-width: none;
-    background-color: transparent;
-    box-shadow: none;
-    float: none;
-    margin-bottom: 5px;
-    padding: 2px 0;
-}
-
-/* --- Input Area Adjustments --- */
-#input-area {
-    border-top: 1px solid #eee; /* Lighter border */
-    padding: 8px;
-    background-color: #f8f9fa;
-    flex-shrink: 0; /* Prevent input area from shrinking */
-}
-
-#chat-input {
-     line-height: 1.4; /* Better spacing for multi-line */
-     /* Ensure min-height is respected */
-     min-height: 30px;
-     box-sizing: border-box; /* Include padding/border in height */
-}
-
-
-
-/* --- Phase 4: Model Selector --- */
-#model-selector {
-    padding: 5px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white;
-    margin-right: auto; /* Push signout button to the right */
-    max-width: 200px; /* Prevent it getting too wide */
-    font-size: 0.9em;
-}
-.header-content {
-    /* Ensure flex alignment works well with select */
-    align-items: center;
-    padding: 5px 10px; /* Add padding to header content */
-}
-
-/* --- Phase 5: Chat Bubble Styling --- */
-
-#message-display {
-    /* Keep existing styles like flex-grow, background-color, padding */
-    overflow-y: scroll; /* Ensure scrolling is enabled */
-    /* Hidden Scrollbar CSS */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-}
-#message-display::-webkit-scrollbar { /* WebKit */
-    width: 0;
-    height: 0;
-}
-
-
-.message-bubble {
+   }
+   
+  
+   /* --- Message Bubble Styles --- */
+   .message-bubble {
     padding: 10px 15px; /* Slightly more padding */
     border-radius: 18px; /* More rounded */
     margin-bottom: 12px; /* More spacing */
@@ -216,44 +142,47 @@ body {
     display: flex;
     flex-direction: column; /* Stack content and timestamp */
     line-height: 1.4; /* Improve readability */
-}
-
-/* Timestamp Styling */
-.timestamp {
+   }
+   
+  
+   /* Timestamp Styling */
+   .timestamp {
     font-size: 0.7em; /* Smaller timestamp */
     color: #999; /* Default timestamp color */
     margin-top: 5px;
     text-align: right; /* Align timestamp to the right within bubble */
     align-self: flex-end; /* Ensure it stays right */
-}
-
-/* User Bubble */
-.user-bubble {
+   }
+   
+  
+   /* User Bubble */
+   .user-bubble {
     background-color: #007bff;
     color: white;
     margin-left: auto; /* Push bubble right */
     float: right; /* Align bubble right */
     border-bottom-right-radius: 5px; /* Characteristic flat corner */
-}
-.user-bubble .timestamp {
+   }
+   .user-bubble .timestamp {
     color: #e0e0e0; /* Lighter timestamp on dark background */
-}
-
-/* AI Bubble */
-.ai-bubble {
+   }
+   
+  
+   /* AI Bubble */
+   .ai-bubble {
     background-color: #f1f1f1; /* Light grey */
     color: #333;
     margin-right: auto; /* Push bubble left */
     float: left; /* Align bubble left */
     border-bottom-left-radius: 5px; /* Characteristic flat corner */
-}
-.ai-bubble .timestamp {
-     color: #6c757d; /* Darker grey timestamp */
-}
-
-
-/* System Message Bubble */
-.system-bubble {
+   }
+   .ai-bubble .timestamp {
+    color: #6c757d; /* Darker grey timestamp */
+   }
+   
+  
+   /* System Message Bubble */
+   .system-bubble {
     font-style: italic;
     color: #6c757d;
     text-align: center;
@@ -265,18 +194,21 @@ body {
     margin-bottom: 8px;
     padding: 2px 0;
     border-radius: 0; /* No rounding needed */
-}
-
-/* Clearfix to ensure container respects floated children */
-#message-display::after {
-  content: "";
-  clear: both;
-  display: table;
-}
-
-/* --- Phase 6: Bottom Banner & Popups --- */
-
-#bottom-banner {
+   }
+   
+  
+   /* Clearfix to ensure container respects floated children */
+   #message-display::after {
+    content: "";
+    clear: both;
+    display: table;
+   }
+   
+  
+   /* --- Phase 6: Bottom Banner & Popups --- */
+   
+  
+   #bottom-banner {
     display: flex;
     justify-content: center; /* Center buttons */
     align-items: center;
@@ -284,9 +216,19 @@ body {
     /* background-color: transparent; */ /* User requested transparent */
     border-top: 1px solid #eee; /* Add a subtle separator line */
     flex-shrink: 0; /* Prevent banner from shrinking */
-}
-
-.banner-button {
+    order: 2; /* Make banner appear visually before input area if both inside chat-ui */
+   }
+   
+  
+   #input-area {
+    order: 3; /* Ensure input area is last */
+   }
+   #message-display {
+    order: 1; /* Ensure message display is first */
+   }
+   
+  
+   .banner-button {
     background-color: #6c757d; /* Grey */
     color: white;
     border: none;
@@ -300,14 +242,16 @@ body {
     justify-content: center;
     align-items: center;
     transition: background-color 0.2s ease;
-}
-
-.banner-button:hover {
+   }
+   
+  
+   .banner-button:hover {
     background-color: #5a6268; /* Darker grey on hover */
-}
-
-/* Popup Backdrop */
-.popup-backdrop {
+   }
+   
+  
+   /* Popup Backdrop */
+   .popup-backdrop {
     position: fixed; /* Cover entire viewport */
     top: 0;
     left: 0;
@@ -316,36 +260,40 @@ body {
     background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
     z-index: 999; /* Ensure it's above main content but below popup */
     display: none; /* Hidden by default */
-}
-
-/* Basic Popup Styling */
-.popup {
+   }
+   
+  
+   /* Basic Popup Styling */
+   .popup {
     position: fixed; /* Position relative to viewport */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); /* Center the popup */
-    width: 80%; /* Responsive width */
+    width: 90%; /* More responsive width */
     max-width: 600px; /* Max width */
     background-color: white;
     border: 1px solid black; /* User requested black border */
     border-radius: 8px; /* User requested rounded border */
-    padding: 20px;
+    padding: 25px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     z-index: 1000; /* Ensure popup is above backdrop */
     display: none; /* Hidden by default */
-    max-height: 80vh; /* Limit height */
+    max-height: 85vh; /* Limit height slightly more */
     overflow-y: auto; /* Add scroll if content exceeds height */
-}
-
-.popup h2 {
+   }
+   
+  
+   .popup h2 {
     margin-top: 0;
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
     margin-bottom: 15px;
-}
-
-/* Style for close buttons inside popups */
-.close-popup-btn {
+    font-size: 1.4em;
+   }
+   
+  
+   /* Style for close buttons inside popups */
+   .close-popup-btn {
     display: block; /* Make it block level */
     margin-top: 20px; /* Space above */
     margin-left: auto; /* Push to right */
@@ -355,7 +303,108 @@ body {
     border: none;
     border-radius: 5px; /* Rounded button */
     cursor: pointer;
-}
-.close-popup-btn:hover {
+   }
+   .close-popup-btn:hover {
     background-color: #5a6268;
-}
+   }
+   
+  
+   /* --- Phase 7: Message Action Buttons --- */
+   
+  
+   .message-actions {
+    display: flex; /* Arrange buttons horizontally */
+    justify-content: flex-end; /* Align buttons to the right below the bubble */
+    align-items: center;
+    margin-top: 5px; /* Space between content and buttons */
+    margin-left: auto; /* Ensure it aligns right within the bubble */
+    height: 18px; /* Set a fixed height */
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.2s ease-in-out; /* Smooth fade effect */
+   }
+   
+  
+   /* Show actions on bubble hover */
+   .message-bubble:hover .message-actions {
+    opacity: 1;
+   }
+   
+  
+   
+  
+   .action-button {
+    background: none;
+    border: none;
+    color: #6c757d; /* Default grey color */
+    cursor: pointer;
+    font-size: 0.85em; /* Small icons */
+    padding: 0;
+    margin-left: 8px; /* Space between buttons */
+    line-height: 1; /* Ensure icon aligns well */
+   }
+   
+  
+   .action-button:hover {
+    color: #343a40; /* Darker on hover */
+   }
+   
+  
+   /* Specific color for user bubble actions */
+   .user-bubble .action-button {
+    color: #adb5bd; /* Lighter grey on dark background */
+   }
+   .user-bubble .action-button:hover {
+    color: #f8f9fa; /* White on hover */
+   }
+   
+  
+   /* Hide actions on system messages */
+   .system-bubble .message-actions {
+    display: none;
+   }
+   
+  
+   /* --- Phase 9: TTS Popup Styling --- */
+   
+  
+   #tts-input-area {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+   }
+   
+  
+   #tts-text-input {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 1em;
+    resize: none;
+    min-height: 40px;
+    max-height: 100px;
+    overflow-y: auto;
+    margin-right: 5px;
+   }
+   
+  
+   #tts-send-button, #tts-mic-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 1em;
+   }
+   
+  
+   #tts-send-button:hover, #tts-mic-button:hover {
+    background-color: #0056b3;
+   }
+   
+  
+   #tts-audio-player {
+    /* Style for audio player or status */
+    margin-top: 10px;
+   }

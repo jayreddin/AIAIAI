@@ -1,84 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puter AI Chat App</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <header id="header-container">
-        <div class="header-content">
-             <label for="model-selector" style="margin-right: 5px; color: #555; font-size: 0.9em;">Model:</label>
-             <select id="model-selector">
-                 <option value="">Loading Models...</option>
-             </select>
-             <button id="signout-button" style="display: none;">Sign Out</button>
-        </div>
-    </header>
+ <html lang="en">
+ 
 
-    <main id="app-container">
-        <h1>Puter AI Chat App</h1>
-        <div id="auth-section">
-            <button id="signin-button">Sign In with Puter</button>
-            <div id="auth-status">Checking sign-in status...</div>
-        </div>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puter AI Chat App</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+ </head>
+ 
 
-        <div id="chat-ui" style="display: none;">
-            <div id="message-display">
-                </div>
+ <body>
+  <header id="header-container">
+  <div class="header-content">
+   <label for="model-selector" style="margin-right: 5px; color: #555; font-size: 0.9em;">Model:</label>
+   <select id="model-selector">
+    <option value="">Loading Models...</option>
+   </select>
+   <button id="signout-button" style="display: none;">Sign Out</button>
+  </div>
+  </header>
+ 
 
-            <div id="bottom-banner">
-                <button id="new-chat-btn" class="banner-button" title="New Chat"><i class="fas fa-plus"></i></button>
-                <button id="history-btn" class="banner-button" title="Chat History"><i class="fas fa-history"></i></button>
-                <button id="img-gen-btn" class="banner-button" title="Image Generation"><i class="fas fa-image"></i></button>
-                <button id="ocr-btn" class="banner-button" title="OCR (Image to Text)"><i class="fas fa-file-alt"></i></button> <button id="vision-btn" class="banner-button" title="Vision (Camera)"><i class="fas fa-eye"></i></button>
-                <button id="tts-btn" class="banner-button" title="Text-to-Speech Mode"><i class="fas fa-volume-up"></i></button>
-                <button id="settings-btn" class="banner-button" title="Settings"><i class="fas fa-cog"></i></button>
-            </div>
+  <main id="app-container">
+  <h1>Puter AI Chat App</h1>
+  <div id="auth-section">
+   <button id="signin-button">Sign In with Puter</button>
+   <div id="auth-status">Checking sign-in status...</div>
+  </div>
+ 
 
-            <div id="input-area">
-                <button id="mic-button" title="Microphone Input (Not Implemented Yet)">🎤</button>
-                <textarea id="chat-input" placeholder="Type your message here..." rows="1"></textarea>
-                <button id="send-button" title="Send Message">➤</button>
-            </div>
-        </div>
-    </main>
+  <div id="chat-ui" style="display: none;">
+  <div id="message-display">
+  </div>
+ 
 
-    <div id="popup-backdrop" class="popup-backdrop" style="display: none;"></div>
+  <div id="bottom-banner">
+   <button id="new-chat-btn" class="banner-button" title="New Chat"><i class="fas fa-plus"></i></button>
+   <button id="history-btn" class="banner-button" title="Chat History"><i class="fas fa-history"></i></button>
+   <button id="img-gen-btn" class="banner-button" title="Image Generation"><i class="fas fa-image"></i></button>
+   <button id="ocr-btn" class="banner-button" title="OCR (Image to Text)"><i class="fas fa-file-alt"></i></button>
+   <button id="vision-btn" class="banner-button" title="Vision (Camera)"><i class="fas fa-eye"></i></button>
+   <button id="tts-btn" class="banner-button" title="Text-to-Speech Mode"><i class="fas fa-volume-up"></i></button>
+   <button id="settings-btn" class="banner-button" title="Settings"><i class="fas fa-cog"></i></button>
+  </div>
+ 
 
-    <div id="history-popup" class="popup" style="display: none;">
-        <h2>Chat History</h2>
-        <p>[History content will go here - Phase 8]</p>
-        <button class="close-popup-btn">Close</button>
-    </div>
-    <div id="img-gen-popup" class="popup" style="display: none;">
-        <h2>Image Generation</h2>
-        <p>[Image Gen content will go here - Phase 11]</p>
-        <button class="close-popup-btn">Close</button>
-    </div>
-    <div id="ocr-popup" class="popup" style="display: none;">
-        <h2>OCR (Image to Text)</h2>
-        <p>[OCR content will go here - Phase 12]</p>
-        <button class="close-popup-btn">Close</button>
-    </div>
-    <div id="vision-popup" class="popup" style="display: none;">
-        <h2>Vision</h2>
-        <p>[Vision content will go here - Phase 13]</p>
-        <button class="close-popup-btn">Close</button>
-    </div>
-     <div id="tts-popup" class="popup" style="display: none;">
-        <h2>Text-to-Speech Mode</h2>
-        <p>[TTS content will go here - Phase 9]</p>
-        <button class="close-popup-btn">Close</button>
-    </div>
-    <div id="settings-popup" class="popup" style="display: none;">
-        <h2>Settings</h2>
-        <p>[Settings content will go here - Phase 14]</p>
-        <button class="close-popup-btn">Close</button>
-    </div>
-    <script src="https://js.puter.com/v2/"></script>
-    <script src="script.js"></script>
-</body>
-</html>
+  <div id="input-area">
+   <button id="mic-button" title="Microphone Input (Not Implemented Yet)">🎤</button>
+   <textarea id="chat-input" placeholder="Type your message here..." rows="1"></textarea>
+   <button id="send-button" title="Send Message">➤</button>
+  </div>
+  </div>
+  </main>
+ 
+
+  <div id="popup-backdrop" class="popup-backdrop" style="display: none;"></div>
+ 
+
+  <div id="history-popup" class="popup" style="display: none;">
+  <h2>Chat History</h2>
+  <div id="history-list">
+  </div>
+  <button class="close-popup-btn">Close</button>
+  </div>
+  <div id="img-gen-popup" class="popup" style="display: none;">
+  <h2>Image Generation</h2>
+  <p>[Image Gen content will go here - Phase 11]</p>
+  <button class="close-popup-btn">Close</button>
+  </div>
+  <div id="ocr-popup" class="popup" style="display: none;">
+  <h2>OCR (Image to Text)</h2>
+  <p>[OCR content will go here - Phase 12]</p>
+  <button class="close-popup-btn">Close</button>
+  </div>
+  <div id="vision-popup" class="popup" style="display: none;">
+  <h2>Vision</h2>
+  <p>[Vision content will go here - Phase 13]</p>
+  <button class="close-popup-btn">Close</button>
+  </div>
+  <div id="tts-popup" class="popup" style="display: none;">
+  <h2>Text-to-Speech Mode</h2>
+  <div id="tts-input-area">
+   <textarea id="tts-text-input" placeholder="Enter text to speak"></textarea>
+   <button id="tts-send-button">Speak</button>
+   <button id="tts-mic-button" title="Microphone Input (Not Implemented Yet)">🎤</button>
+  </div>
+  <div id="tts-audio-player">
+   </div>
+  <button class="close-popup-btn">Close</button>
+  </div>
+  <div id="settings-popup" class="popup" style="display: none;">
+  <h2>Settings</h2>
+  <p>[Settings content will go here - Phase 14]</p>
+  <button class="close-popup-btn">Close</button>
+  </div>
+ 
+
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="script.js"></script>
+ </body>
+ </html>
