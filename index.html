@@ -219,11 +219,12 @@
           <div id="settings-tabs">
               <button class="settings-tab-btn active" data-tab="models">Models</button>
               <button class="settings-tab-btn" data-tab="ui">UI</button>
+              <button class="settings-tab-btn" data-tab="audiovideo">Audio/Video</button>
               <button class="settings-tab-btn" data-tab="about">About</button>
           </div>
       </div>
 
-      <div class="popup-content-area">
+      <div class="popup-content-area" style="overflow-y: auto;">
           <div id="settings-tab-content">
               <div id="settings-models-panel" class="settings-tab-panel active">
                   <h3>Available Models</h3>
@@ -244,15 +245,29 @@
                   <select id="settings-theme-select">
                       <option value="light">Light</option>
                       <option value="dark">Dark (TBD)</option>
-                      </select>
+                  </select>
 
                   <label for="settings-text-size">Text Size:</label>
                   <input type="range" id="settings-text-size" min="80" max="140" value="100" step="5">
                   <span id="settings-text-size-value">100%</span>
 
                   <button id="settings-ui-save" style="margin-top: 15px;">Save UI Settings</button>
-                   <div id="settings-ui-status" class="settings-status"></div>
-             </div>
+                  <div id="settings-ui-status" class="settings-status"></div>
+              </div>
+
+              <div id="settings-audiovideo-panel" class="settings-tab-panel">
+                  <h3>Audio/Video</h3>
+                  <label for="language-select">Voice:</label>
+                  <select id="language-select">
+                      <option value="en-US">English (US)</option>
+                      <option value="fr-FR">French</option>
+                      <option value="de-DE">German</option>
+                      <option value="es-ES">Spanish</option>
+                      <option value="it-IT">Italian</option>
+                  </select>
+                  <button id="settings-audiovideo-save" style="margin-top: 15px;">Save Audio/Video Selection</button>
+                  <div id="settings-audiovideo-status" class="settings-status"></div>
+              </div>
 
               <div id="settings-about-panel" class="settings-tab-panel">
                   <h3>About Puter AI Chat</h3>
@@ -262,11 +277,10 @@
                       <p>Powered by <a href="https://puter.com" target="_blank">Puter.com</a></p>
                       <p><a href="https://github.com/HeyPuter/puter" target="_blank">Puter on GitHub</a></p>
                       <p><a href="https://docs.puter.com" target="_blank">Puter.js Documentation</a></p>
-                      </div>
                   </div>
+              </div>
           </div>
       </div>
-      <button class="close-popup-btn">Close</button>
   </div>
 
   <div id="image-modal-backdrop" class="popup-backdrop" style="display: none; z-index: 1001;"></div>
@@ -280,6 +294,6 @@
 
 
   <script src="https://js.puter.com/v2/"></script>
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
  </body>
  </html>
