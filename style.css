@@ -273,26 +273,33 @@ body {
     width: 90%; max-width: 700px; /* Increased max-width */
     background-color: #ffffff;
     border-radius: 10px; /* Slightly more rounded */
-    padding: 25px 30px; /* More padding */
     box-shadow: 0 8px 25px rgba(0,0,0,0.25); /* Stronger shadow */
     z-index: 1000; display: none;
     max-height: 85vh; /* Keep max height */
     display: flex; /* Use flexbox for better internal layout */
     flex-direction: column;
 }
+
+.popup-header { /* Container for title and potentially other header elements like tabs */
+    padding: 20px 30px 15px 30px; /* Adjust padding */
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
 .popup h2 {
-    margin-top: 0; border-bottom: 1px solid #eee;
-    padding-bottom: 15px; /* More space below title */
-    margin-bottom: 20px; /* More space above content */
+    margin: 0; /* Remove default margin */
+    padding: 0;
+    margin-bottom: 15px; /* Space below title if tabs are not present or below tabs */
     font-size: 1.5em; /* Larger title */
     color: #333;
-    flex-shrink: 0; /* Prevent title from shrinking */
 }
-.popup-content-area { /* Add a wrapper for scrollable content */
+
+.popup-content-area {
+    padding: 20px 30px; /* Padding for the main content */
     overflow-y: auto; /* Scroll only the content */
     flex-grow: 1; /* Allow content to fill space */
-    margin-bottom: 20px; /* Space before close button */
 }
+
 .popup label { /* Style labels in popups */
     display: block;
     margin-top: 10px;
@@ -303,6 +310,7 @@ body {
 }
 .popup input[type="text"],
 .popup input[type="number"],
+.popup input[type="range"],
 .popup textarea,
 .popup select {
     width: 100%;
@@ -317,7 +325,7 @@ body {
     resize: vertical;
     min-height: 60px;
 }
-.popup button:not(.close-popup-btn):not(.banner-button):not(.action-button) { /* Style general popup buttons */
+.popup button:not(.close-popup-btn):not(.banner-button):not(.action-button):not(.settings-tab-btn):not(.ocr-remove-thumb-btn):not(.img-gen-save-btn) { /* Style general popup buttons more specifically */
     padding: 10px 15px;
     background-color: #007bff;
     color: white;
@@ -328,7 +336,7 @@ body {
     margin-right: 8px;
     margin-top: 5px;
 }
-.popup button:not(.close-popup-btn):not(.banner-button):not(.action-button):hover {
+.popup button:not(.close-popup-btn):not(.banner-button):not(.action-button):not(.settings-tab-btn):not(.ocr-remove-thumb-btn):not(.img-gen-save-btn):hover {
     background-color: #0056b3;
 }
 .popup button:disabled {
@@ -337,8 +345,8 @@ body {
 }
 
 .close-popup-btn {
-    display: block; margin-top: auto; /* Push to bottom */
-    margin-left: auto; margin-right: auto; /* Center */
+    display: block;
+    margin: 20px auto 0 auto; /* Add top margin, center horizontally */
     padding: 10px 20px; /* Larger button */
     background-color: #6c757d;
     color: white; border: none; border-radius: 5px;
@@ -348,13 +356,14 @@ body {
 .close-popup-btn:hover { background-color: #5a6268; }
 
 /* --- History Popup Specific --- */
-#history-list { min-height: 100px; }
+#history-list { min-height: 100px; max-height: 400px; overflow-y: auto;}
 .history-item {
     padding: 8px 5px;
     border-bottom: 1px dotted #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 .history-item:last-child { border-bottom: none; }
 .history-item button {
@@ -363,9 +372,13 @@ body {
     background-color: #e9ecef;
     border: 1px solid #ced4da;
     color: #495057;
+    cursor: pointer;
+    border-radius: 3px;
+    flex-shrink: 0;
 }
 .history-item button:hover { background-color: #dee2e6; }
-.history-item button[style*="color: red"] { color: red; }
+.history-item button[style*="color: red"] { color: red; border-color: #dc3545; background-color: #f8d7da;}
+.history-item button[style*="color: red"]:hover { background-color: #f1b0b7; }
 
 /* --- TTS Popup Specific --- */
 #tts-input-area { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 15px; }
@@ -376,8 +389,8 @@ body {
 #tts-mic-button.recording:hover { background-color: #c82333; }
 #tts-send-button:hover, #tts-mic-button:hover { background-color: #0056b3; }
 
-#tts-output-area { margin-top: 10px; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px; background-color: #f9f9f9; }
-.tts-entry { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #ddd; margin-bottom: 5px; }
+#tts-output-area { margin-top: 10px; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px; background-color: #f9f9f9; min-height: 50px; }
+.tts-entry { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #ddd; margin-bottom: 5px; gap: 10px; }
 .tts-entry:last-child { border-bottom: none; }
 .tts-entry-text { flex-grow: 1; margin-right: 10px; font-size: 0.95em; word-break: break-word; }
 .tts-replay-button { background-color: #28a745; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 0.85em; white-space: nowrap; flex-shrink: 0; }
@@ -402,34 +415,27 @@ body {
 }
 
 /* Button container for generate/download */
-.img-gen-buttons {
-    margin-top: 15px;
-    text-align: center;
-}
+.img-gen-buttons { margin-top: 15px; text-align: center; display: flex; justify-content: center; gap: 15px; }
 
 /* Output areas for story/comic */
-.img-gen-output-area {
-    margin-top: 15px;
-    padding: 10px;
-    border: 1px dashed #ccc;
-    min-height: 150px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-.story-chapter h3 { margin-top: 15px; margin-bottom: 5px; font-size: 1.1em; }
-.story-image, .comic-panel-image { max-width: 80%; margin: 10px auto; display: block; border: 1px solid #eee; }
+.img-gen-output-area { margin-top: 15px; padding: 10px; border: 1px dashed #ccc; min-height: 150px; border-radius: 5px; background-color: #f9f9f9; max-height: 40vh; overflow-y: auto; }
+.story-chapter h3 { margin-top: 15px; margin-bottom: 5px; font-size: 1.1em; color: #0056b3; border-bottom: 1px solid #eee; padding-bottom: 3px;}
+.story-image, .comic-panel-image { max-width: 80%; margin: 15px auto; display: block; border: 1px solid #eee; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .story-paragraph { line-height: 1.5; margin-bottom: 10px; }
+.comic-panel { border-bottom: 1px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px; }
+.comic-panel:last-child { border-bottom: none; }
+.comic-panel h4 { font-size: 1em; margin-bottom: 5px; color: #5a6268; }
 
 /* Card specific styles */
 .card-image-controls { margin: 5px 0 10px 0; display: flex; gap: 10px; }
 .card-image-controls button { flex-grow: 1; } /* Make buttons fill space */
-#card-image-preview-area {
-    border: 1px dashed #ccc; min-height: 80px; padding: 5px;
-    margin-bottom: 10px; border-radius: 4px; background: #fafafa;
-}
-#card-image-search-results img { width: 100%; height: 80px; object-fit: cover; cursor: pointer; border: 2px solid transparent; border-radius: 3px; }
+#card-image-preview-area { border: 1px dashed #ccc; min-height: 80px; padding: 10px; margin-bottom: 10px; border-radius: 4px; background: #fafafa; }
+#card-image-search-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+#card-image-search-results img { width: 100%; height: 80px; object-fit: cover; cursor: pointer; border: 2px solid #ddd; border-radius: 3px; transition: border-color 0.2s; }
 #card-image-search-results img:hover { border-color: #007bff; }
-#card-image-search-results img.selected { border-color: #28a745; box-shadow: 0 0 5px #28a745; }
+#card-image-search-results img.selected { border-color: #28a745; box-shadow: 0 0 5px rgba(40, 167, 69, 0.7); }
+#card-custom-size-inputs label { display: inline-block; margin-right: 5px; margin-left: 10px; }
+#card-custom-size-inputs input { width: 60px; display: inline-block; margin-right: 10px; }
 
 /* Basic mode results */
 .img-gen-results-container { margin-top: 15px; }
@@ -480,7 +486,7 @@ body {
 #vision-video-preview { display: block; width: 100%; max-height: 40vh; object-fit: contain; }
 #vision-controls button, #vision-actions button, #vision-enable-cam-btn { padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin: 0 5px; }
 #vision-controls button i, #vision-actions button i, #vision-enable-cam-btn i { margin-right: 5px; }
-#vision-enable-cam-btn { background-color: #007bff; color: white; }
+#vision-enable-cam-btn { background-color: #007bff; color: white; display: block; margin: 10px auto; } /* Center enable button */
 #vision-enable-cam-btn:hover { background-color: #0056b3; }
 #vision-describe-btn { background-color: #28a745; color: white; }
 #vision-describe-btn:hover { background-color: #218838; }
@@ -490,4 +496,61 @@ body {
 #vision-actions button { background-color: #6c757d; color: white; }
 #vision-actions button:hover { background-color: #5a6268; }
 #vision-actions button:disabled { background-color: #ccc; cursor: not-allowed; }
-#vision-status { color: #6c757d; font-style: italic; }
+#vision-status { color: #6c757d; font-style: italic; text-align: center; }
+
+/* --- Settings Popup Specific (Phase 14) --- */
+#settings-tabs {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 0; /* Remove space below tabs if they are in header */
+    margin-top: 10px; /* Space between title and tabs */
+}
+
+.settings-tab-btn {
+    padding: 10px 15px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px; /* Overlap the container border */
+    color: #6c757d;
+    font-size: 1em;
+    margin-right: 5px;
+}
+.settings-tab-btn.active {
+    border-bottom-color: #007bff;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.settings-tab-panel { display: none; padding-top: 20px; /* Add space above panel content */ }
+.settings-tab-panel.active { display: block; }
+
+/* Models Tab */
+.settings-model-controls { margin-bottom: 10px; }
+.settings-model-controls button { font-size: 0.85em; padding: 5px 10px; margin-right: 10px; }
+#settings-models-list { max-height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 15px; margin-top: 10px; background: #fdfdfd; border-radius: 4px; }
+.settings-model-item { display: block; margin-bottom: 8px; }
+.settings-model-item input[type="checkbox"] { margin-right: 8px; }
+.settings-model-item label { font-weight: normal; font-size: 0.95em; }
+#settings-models-save { margin-top: 15px; display: block; margin-left: auto; margin-right: auto; }
+
+/* UI Tab */
+#settings-text-size { width: calc(100% - 50px); /* Adjust width to accommodate value display */ display: inline-block; vertical-align: middle; }
+#settings-text-size-value { display: inline-block; width: 40px; text-align: right; vertical-align: middle; font-size: 0.9em; color: #555;}
+#settings-ui-save { margin-top: 15px; display: block; margin-left: auto; margin-right: auto; }
+
+/* About Tab */
+#settings-about-content p { line-height: 1.6; margin-bottom: 12px; }
+#settings-about-content a { color: #007bff; text-decoration: none; }
+#settings-about-content a:hover { text-decoration: underline; }
+
+/* Status messages */
+.settings-status {
+    margin-top: 10px;
+    text-align: center;
+    font-style: italic;
+    color: green;
+    font-size: 0.9em;
+    height: 1.2em; /* Reserve space */
+}

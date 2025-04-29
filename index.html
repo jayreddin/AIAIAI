@@ -64,183 +64,209 @@
 
 
   <div id="history-popup" class="popup" style="display: none;">
-  <h2>Chat History</h2>
-  <div id="history-list">
-      <p>Loading history...</p>
-  </div>
-  <button class="close-popup-btn">Close</button>
-  </div>
-
-  <div id="img-gen-popup" class="popup" style="display: none;">
-   <h2>Image Generation</h2>
-   <div id="img-gen-content">
-       <div id="img-gen-modes">
-           <button class="img-gen-mode-btn active" data-mode="basic">Basic</button>
-           <button class="img-gen-mode-btn" data-mode="story">Story</button>
-           <button class="img-gen-mode-btn" data-mode="card">Card</button>
-           <button class="img-gen-mode-btn" data-mode="comic">Comic</button>
-       </div>
-
-       <div id="img-gen-mode-ui">
-           <div id="img-gen-basic-mode" class="img-gen-mode-panel active">
-               <textarea id="img-gen-prompt" placeholder="Enter image prompt..." rows="3"></textarea>
-               <button id="img-gen-generate-btn">Generate</button>
-           </div>
-
-           <div id="img-gen-story-mode" class="img-gen-mode-panel">
-               <label for="story-characters">Characters:</label>
-               <input type="text" id="story-characters" placeholder="E.g., Brave knight, wise dragon">
-               <label for="story-setting">Setting:</label>
-               <input type="text" id="story-setting" placeholder="E.g., Enchanted forest, futuristic city">
-               <label for="story-plot">Plot Summary:</label>
-               <textarea id="story-plot" placeholder="Describe the story chapter by chapter or scene by scene..." rows="4"></textarea>
-               <div class="img-gen-buttons">
-                   <button id="story-generate-btn">Generate Story</button>
-                   <button id="story-download-btn" style="display: none;">Download Story</button>
-               </div>
-               <div id="story-output" class="img-gen-output-area">
-                   </div>
-           </div>
-
-           <div id="img-gen-card-mode" class="img-gen-mode-panel">
-               <label for="card-type">Type:</label>
-               <select id="card-type">
-                   <option value="birthday">Birthday</option>
-                   <option value="thankyou">Thank You</option>
-                   <option value="holiday">Holiday</option>
-                   <option value="congrats">Congratulations</option>
-                   <option value="getwell">Get Well Soon</option>
-                   <option value="custom">Custom</option>
-               </select>
-
-               <label for="card-visual-desc">Visual Description (for image):</label>
-               <textarea id="card-visual-desc" placeholder="Describe the image for the card front..." rows="3"></textarea>
-               <div class="card-image-controls">
-                   <button id="card-generate-img-btn">Generate Card Image</button>
-                   <button id="card-search-img-btn">Search Card Image (Web)</button>
-               </div>
-               <div id="card-image-preview-area">
-                   <div id="card-image-loading" style="display: none; text-align: center; padding: 10px;">Loading images... <i class="fas fa-spinner fa-spin"></i></div>
-                   <div id="card-image-search-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 5px;"></div>
-               </div>
-               <div id="card-selected-image-display" style="margin-top: 10px; text-align: center; display:none;">
-                   <p style="margin-bottom: 5px;">Selected Image:</p>
-                   <img id="card-selected-image-thumb" src="#" alt="Selected Card Image" style="max-width: 150px; max-height: 100px; border: 1px solid #ccc;">
-               </div>
-
-               <label for="card-recipient">Recipient:</label>
-               <input type="text" id="card-recipient" placeholder="E.g., Mom, John Doe">
-               <label for="card-message">Message:</label>
-               <textarea id="card-message" placeholder="Write your message here..." rows="3"></textarea>
-               <label for="card-sender">Your Name:</label>
-               <input type="text" id="card-sender" placeholder="E.g., From Jane">
-
-               <label for="card-size">Card Size (Folded):</label>
-               <select id="card-size">
-                   <option value="A2">A2 (4.25" x 5.5")</option>
-                   <option value="A6">A6 (4.625" x 6.25")</option>
-                   <option value="A7">A7 (5" x 7")</option>
-                   <option value="SQ5">Square (5" x 5")</option>
-                   <option value="custom">Custom Size</option>
-               </select>
-               <div id="card-custom-size-inputs" style="display: none; margin-top: 5px;">
-                   <label for="card-custom-width">Width (in):</label>
-                   <input type="number" id="card-custom-width" step="0.1" min="1">
-                   <label for="card-custom-height">Height (in):</label>
-                   <input type="number" id="card-custom-height" step="0.1" min="1">
-               </div>
-
-               <div class="img-gen-buttons">
-                   <button id="card-generate-btn">Generate Card</button>
-                   <button id="card-download-btn" style="display: none;">Download Card</button>
-               </div>
-           </div>
-
-           <div id="img-gen-comic-mode" class="img-gen-mode-panel">
-               <label for="comic-characters">Characters:</label>
-               <input type="text" id="comic-characters" placeholder="E.g., Superhero Cat, Robot Sidekick">
-               <label for="comic-plot">Plot Summary (Panel by Panel):</label>
-               <textarea id="comic-plot" placeholder="Describe each panel's action and dialogue..." rows="4"></textarea>
-               <label for="comic-setting">Setting:</label>
-               <input type="text" id="comic-setting" placeholder="E.g., Bustling city, space station">
-               <div class="img-gen-buttons">
-                   <button id="comic-generate-btn">Generate Comic</button>
-                   <button id="comic-download-btn" style="display: none;">Download Comic</button>
-               </div>
-                <div id="comic-output" class="img-gen-output-area">
-                   </div>
-           </div>
-       </div>
-
-       <div id="img-gen-basic-results-area" class="img-gen-results-container">
-           <div id="img-gen-results-heading" style="margin-top: 15px; font-weight: bold;">Results:</div>
-           <div id="img-gen-results">
-               <div id="img-gen-loading" style="display: none; text-align: center; padding: 20px;">Generating image... <i class="fas fa-spinner fa-spin"></i></div>
-               <div id="img-gen-error" style="display: none; color: red; text-align: center; padding: 10px;"></div>
-                </div>
-       </div>
-   </div>
-   <button class="close-popup-btn">Close</button>
-  </div>
-
-
-  <div id="ocr-popup" class="popup" style="display: none;">
-      <h2>OCR (Image to Text)</h2>
-      <div id="ocr-content">
-          <input type="file" id="ocr-file-input" accept="image/*" style="display: none;">
-          <button id="ocr-upload-btn"><i class="fas fa-upload"></i> Upload Image</button>
-          <div id="ocr-thumbnail-area">
-              </div>
-          <button id="ocr-extract-btn" disabled><i class="fas fa-search-plus"></i> Extract Text</button>
-          <div id="ocr-status" style="text-align: center; margin: 10px 0; display: none;"></div>
-          <textarea id="ocr-result-text" placeholder="Extracted text will appear here..." rows="8" readonly></textarea>
-          <button id="ocr-copy-btn" disabled><i class="fas fa-copy"></i> Copy Text</button>
+      <div class="popup-header">
+          <h2>Chat History</h2>
       </div>
-      <button class="close-popup-btn">Close</button>
-  </div>
-
-  <div id="vision-popup" class="popup" style="display: none;">
-      <h2>Vision</h2>
-      <div id="vision-content">
-          <button id="vision-enable-cam-btn"><i class="fas fa-camera"></i> Enable Camera</button>
-          <div id="vision-video-container" style="display: none; margin-bottom: 10px; border: 1px solid #ccc; position: relative;">
-               <video id="vision-video-preview" playsinline autoplay muted style="width: 100%; display: block;"></video>
-               </div>
-          <div id="vision-controls" style="display: none; margin-bottom: 10px; text-align: center;">
-              <button id="vision-describe-btn"><i class="fas fa-comment-dots"></i> Describe Frame</button>
-              <button id="vision-stop-cam-btn" style="margin-left: 10px;"><i class="fas fa-stop-circle"></i> Stop Camera</button>
-              </div>
-          <div id="vision-status" style="text-align: center; margin: 10px 0; display: none;"></div>
-          <textarea id="vision-results-text" placeholder="AI description will appear here..." rows="6" readonly style="margin-bottom: 10px;"></textarea>
-          <div id="vision-actions" style="display: none; text-align: center;">
-               <button id="vision-clear-btn"><i class="fas fa-times"></i> Clear</button>
-               <button id="vision-speak-btn" disabled><i class="fas fa-volume-up"></i> Speak</button>
-               <button id="vision-copy-btn" disabled><i class="fas fa-copy"></i> Copy</button>
-               <button id="vision-save-img-btn" disabled><i class="fas fa-save"></i> Save Image</button>
+      <div class="popup-content-area">
+          <div id="history-list">
+              <p>Loading history...</p>
           </div>
       </div>
       <button class="close-popup-btn">Close</button>
   </div>
 
-  <div id="tts-popup" class="popup" style="display: none;">
-  <h2>Text-to-Speech Mode</h2>
-  <div id="tts-input-area">
-   <textarea id="tts-text-input" placeholder="Enter text to speak or use mic to dictate"></textarea>
-   <div id="tts-controls">
-        <button id="tts-send-button" title="Speak Text"><i class="fas fa-play"></i></button>
-        <button id="tts-mic-button" title="Dictate Text"><i class="fas fa-microphone"></i></button>
-   </div>
+  <div id="img-gen-popup" class="popup" style="display: none;">
+      <div class="popup-header">
+          <h2>Image Generation</h2>
+      </div>
+      <div class="popup-content-area">
+          <div id="img-gen-content">
+              <div id="img-gen-modes">
+                  <button class="img-gen-mode-btn active" data-mode="basic">Basic</button>
+                  <button class="img-gen-mode-btn" data-mode="story">Story</button>
+                  <button class="img-gen-mode-btn" data-mode="card">Card</button>
+                  <button class="img-gen-mode-btn" data-mode="comic">Comic</button>
+              </div>
+
+              <div id="img-gen-mode-ui">
+                  <div id="img-gen-basic-mode" class="img-gen-mode-panel active">
+                      <textarea id="img-gen-prompt" placeholder="Enter image prompt..." rows="3"></textarea>
+                      <button id="img-gen-generate-btn">Generate</button>
+                      <div id="img-gen-basic-results-area" class="img-gen-results-container">
+                           <div id="img-gen-results-heading" style="margin-top: 15px; font-weight: bold;">Results:</div>
+                           <div id="img-gen-results">
+                               <div id="img-gen-loading" style="display: none; text-align: center; padding: 20px;">Generating image... <i class="fas fa-spinner fa-spin"></i></div>
+                               <div id="img-gen-error" style="display: none; color: red; text-align: center; padding: 10px;"></div>
+                           </div>
+                       </div>
+                  </div>
+                  <div id="img-gen-story-mode" class="img-gen-mode-panel">
+                      <label for="story-characters">Characters:</label>
+                      <input type="text" id="story-characters" placeholder="E.g., Brave knight, wise dragon">
+                      <label for="story-setting">Setting:</label>
+                      <input type="text" id="story-setting" placeholder="E.g., Enchanted forest, futuristic city">
+                      <label for="story-plot">Plot Summary:</label>
+                      <textarea id="story-plot" placeholder="Describe the story chapter by chapter or scene by scene..." rows="4"></textarea>
+                      <div class="img-gen-buttons">
+                          <button id="story-generate-btn">Generate Story</button>
+                          <button id="story-download-btn" style="display: none;">Download Story (PDF - TBD)</button>
+                      </div>
+                      <div id="story-output" class="img-gen-output-area"></div>
+                  </div>
+                  <div id="img-gen-card-mode" class="img-gen-mode-panel">
+                      <label for="card-type">Type:</label>
+                      <select id="card-type"> <option value="birthday">Birthday</option> <option value="thankyou">Thank You</option> <option value="holiday">Holiday</option> <option value="congrats">Congratulations</option> <option value="getwell">Get Well Soon</option> <option value="custom">Custom</option> </select>
+                      <label for="card-visual-desc">Visual Description (for image):</label>
+                      <textarea id="card-visual-desc" placeholder="Describe the image for the card front..." rows="3"></textarea>
+                      <div class="card-image-controls"> <button id="card-generate-img-btn">Generate Card Image</button> <button id="card-search-img-btn">Search Card Image (TBD)</button> </div>
+                      <div id="card-image-preview-area"> <div id="card-image-loading" style="display: none; text-align: center; padding: 10px;">Loading images... <i class="fas fa-spinner fa-spin"></i></div> <div id="card-image-search-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 5px;"></div> </div>
+                      <div id="card-selected-image-display" style="margin-top: 10px; text-align: center; display:none;"> <p style="margin-bottom: 5px;">Selected Image:</p> <img id="card-selected-image-thumb" src="#" alt="Selected Card Image" style="max-width: 150px; max-height: 100px; border: 1px solid #ccc;"> </div>
+                      <label for="card-recipient">Recipient:</label>
+                      <input type="text" id="card-recipient" placeholder="E.g., Mom, John Doe">
+                      <label for="card-message">Message:</label>
+                      <textarea id="card-message" placeholder="Write your message here..." rows="3"></textarea>
+                      <label for="card-sender">Your Name:</label>
+                      <input type="text" id="card-sender" placeholder="E.g., From Jane">
+                      <label for="card-size">Card Size (Folded):</label>
+                      <select id="card-size"> <option value="A2">A2 (4.25" x 5.5")</option> <option value="A6">A6 (4.625" x 6.25")</option> <option value="A7">A7 (5" x 7")</option> <option value="SQ5">Square (5" x 5")</option> <option value="custom">Custom Size</option> </select>
+                      <div id="card-custom-size-inputs" style="display: none; margin-top: 5px;"> <label for="card-custom-width">Width (in):</label> <input type="number" id="card-custom-width" step="0.1" min="1"> <label for="card-custom-height">Height (in):</label> <input type="number" id="card-custom-height" step="0.1" min="1"> </div>
+                      <div class="img-gen-buttons"> <button id="card-generate-btn">Generate Card Data</button> <button id="card-download-btn" style="display: none;">Download Card (PDF/IMG - TBD)</button> </div>
+                  </div>
+                  <div id="img-gen-comic-mode" class="img-gen-mode-panel">
+                      <label for="comic-characters">Characters:</label>
+                      <input type="text" id="comic-characters" placeholder="E.g., Superhero Cat, Robot Sidekick">
+                      <label for="comic-plot">Plot Summary (Panel by Panel):</label>
+                      <textarea id="comic-plot" placeholder="Describe each panel's action and dialogue..." rows="4"></textarea>
+                      <label for="comic-setting">Setting:</label>
+                      <input type="text" id="comic-setting" placeholder="E.g., Bustling city, space station">
+                      <div class="img-gen-buttons"> <button id="comic-generate-btn">Generate Comic</button> <button id="comic-download-btn" style="display: none;">Download Comic (PDF - TBD)</button> </div>
+                      <div id="comic-output" class="img-gen-output-area"></div>
+                  </div>
+              </div>
+          </div>
+      </div>
+       <button class="close-popup-btn">Close</button>
   </div>
-  <div id="tts-output-heading" style="margin-top: 15px; font-weight: bold;">Generated Speech / Recordings:</div>
-  <div id="tts-output-area" style="margin-top: 5px; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px;">
-   </div>
-  <button class="close-popup-btn">Close</button>
+
+  <div id="ocr-popup" class="popup" style="display: none;">
+       <div class="popup-header">
+           <h2>OCR (Image to Text)</h2>
+       </div>
+       <div class="popup-content-area">
+           <div id="ocr-content">
+               <input type="file" id="ocr-file-input" accept="image/*" style="display: none;">
+               <button id="ocr-upload-btn"><i class="fas fa-upload"></i> Upload Image</button>
+               <div id="ocr-thumbnail-area"></div>
+               <button id="ocr-extract-btn" disabled><i class="fas fa-search-plus"></i> Extract Text</button>
+               <div id="ocr-status" style="text-align: center; margin: 10px 0; display: none;"></div>
+               <textarea id="ocr-result-text" placeholder="Extracted text will appear here..." rows="8" readonly></textarea>
+               <button id="ocr-copy-btn" disabled><i class="fas fa-copy"></i> Copy Text</button>
+           </div>
+       </div>
+       <button class="close-popup-btn">Close</button>
+  </div>
+
+  <div id="vision-popup" class="popup" style="display: none;">
+       <div class="popup-header">
+          <h2>Vision</h2>
+       </div>
+       <div class="popup-content-area">
+          <div id="vision-content">
+              <button id="vision-enable-cam-btn"><i class="fas fa-camera"></i> Enable Camera</button>
+              <div id="vision-video-container" style="display: none; margin-bottom: 10px; border: 1px solid #ccc; position: relative;">
+                   <video id="vision-video-preview" playsinline autoplay muted style="width: 100%; display: block;"></video>
+               </div>
+              <div id="vision-controls" style="display: none; margin-bottom: 10px; text-align: center;">
+                  <button id="vision-describe-btn"><i class="fas fa-comment-dots"></i> Describe Frame</button>
+                  <button id="vision-stop-cam-btn" style="margin-left: 10px;"><i class="fas fa-stop-circle"></i> Stop Camera</button>
+              </div>
+              <div id="vision-status" style="text-align: center; margin: 10px 0; display: none;"></div>
+              <textarea id="vision-results-text" placeholder="AI description will appear here..." rows="6" readonly style="margin-bottom: 10px;"></textarea>
+              <div id="vision-actions" style="display: none; text-align: center;">
+                   <button id="vision-clear-btn"><i class="fas fa-times"></i> Clear</button>
+                   <button id="vision-speak-btn" disabled><i class="fas fa-volume-up"></i> Speak</button>
+                   <button id="vision-copy-btn" disabled><i class="fas fa-copy"></i> Copy</button>
+                   <button id="vision-save-img-btn" disabled><i class="fas fa-save"></i> Save Image</button>
+              </div>
+          </div>
+       </div>
+      <button class="close-popup-btn">Close</button>
+  </div>
+
+  <div id="tts-popup" class="popup" style="display: none;">
+      <div class="popup-header">
+          <h2>Text-to-Speech Mode</h2>
+      </div>
+       <div class="popup-content-area">
+          <div id="tts-input-area">
+           <textarea id="tts-text-input" placeholder="Enter text to speak or use mic to dictate"></textarea>
+           <div id="tts-controls">
+                <button id="tts-send-button" title="Speak Text"><i class="fas fa-play"></i></button>
+                <button id="tts-mic-button" title="Dictate Text"><i class="fas fa-microphone"></i></button>
+           </div>
+          </div>
+          <div id="tts-output-heading" style="margin-top: 15px; font-weight: bold;">Generated Speech / Recordings:</div>
+          <div id="tts-output-area" style="margin-top: 5px; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px;">
+               <div class="tts-status" style="display: none;"></div>
+           </div>
+       </div>
+      <button class="close-popup-btn">Close</button>
   </div>
 
   <div id="settings-popup" class="popup" style="display: none;">
-  <h2>Settings</h2>
-  <p>[Settings content will go here - Phase 14]</p>
-  <button class="close-popup-btn">Close</button>
+      <div class="popup-header">
+          <h2>Settings</h2>
+          <div id="settings-tabs">
+              <button class="settings-tab-btn active" data-tab="models">Models</button>
+              <button class="settings-tab-btn" data-tab="ui">UI</button>
+              <button class="settings-tab-btn" data-tab="about">About</button>
+          </div>
+      </div>
+
+      <div class="popup-content-area">
+          <div id="settings-tab-content">
+              <div id="settings-models-panel" class="settings-tab-panel active">
+                  <h3>Available Models</h3>
+                  <div class="settings-model-controls">
+                       <button id="settings-models-all">Select All</button>
+                       <button id="settings-models-none">Select None</button>
+                  </div>
+                  <div id="settings-models-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 10px; margin-top: 10px;">
+                      <p>Loading models...</p>
+                  </div>
+                  <button id="settings-models-save" style="margin-top: 15px;">Save Model Selection</button>
+                  <div id="settings-models-status" class="settings-status"></div>
+              </div>
+
+              <div id="settings-ui-panel" class="settings-tab-panel">
+                  <h3>Appearance</h3>
+                  <label for="settings-theme-select">Theme:</label>
+                  <select id="settings-theme-select">
+                      <option value="light">Light</option>
+                      <option value="dark">Dark (TBD)</option>
+                      </select>
+
+                  <label for="settings-text-size">Text Size:</label>
+                  <input type="range" id="settings-text-size" min="80" max="140" value="100" step="5">
+                  <span id="settings-text-size-value">100%</span>
+
+                  <button id="settings-ui-save" style="margin-top: 15px;">Save UI Settings</button>
+                   <div id="settings-ui-status" class="settings-status"></div>
+             </div>
+
+              <div id="settings-about-panel" class="settings-tab-panel">
+                  <h3>About Puter AI Chat</h3>
+                  <div id="settings-about-content">
+                      <p>This application utilizes the Puter.js SDK to interact with various AI models and cloud services.</p>
+                      <p>Developed with assistance from Google AI.</p>
+                      <p>Powered by <a href="https://puter.com" target="_blank">Puter.com</a></p>
+                      <p><a href="https://github.com/HeyPuter/puter" target="_blank">Puter on GitHub</a></p>
+                      <p><a href="https://docs.puter.com" target="_blank">Puter.js Documentation</a></p>
+                      </div>
+                  </div>
+          </div>
+      </div>
+      <button class="close-popup-btn">Close</button>
   </div>
 
   <div id="image-modal-backdrop" class="popup-backdrop" style="display: none; z-index: 1001;"></div>
