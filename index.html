@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puter AI Chat App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header id="header-container">
+        <div class="header-content">
+             <!-- Model selector added in Phase 4 -->
+             <label for="model-selector" style="margin-right: 5px; color: #555; font-size: 0.9em;">Model:</label>
+             <select id="model-selector">
+                 <option value="">Loading Models...</option>
+             </select>
+             <!-- Sign Out Button - Initially hidden -->
+             <button id="signout-button" style="display: none;">Sign Out</button>
+        </div>
+    </header>
+
+    <main id="app-container">
+        <h1>Puter AI Chat App</h1>
+        <div id="auth-section">
+            <button id="signin-button">Sign In with Puter</button>
+            <div id="auth-status">Checking sign-in status...</div>
+        </div>
+
+        <!-- Updated chat-ui to use flex column layout -->
+        <div id="chat-ui" style="display: none;">
+            <div id="message-display">
+                <!-- Chat messages appear here -->
+            </div>
+            <!-- Banner Area (to be added later in Phase 6) -->
+            <!-- <div id="bottom-banner"></div> -->
+            <div id="input-area">
+                <button id="mic-button" title="Microphone Input (Not Implemented Yet)">🎤</button>
+                <textarea id="chat-input" placeholder="Type your message here..." rows="1"></textarea>
+                <button id="send-button" title="Send Message">➤</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Puter.js SDK should be loaded before the script that uses it -->
+    <script src="https://js.puter.com/v2/"></script>
+    <script src="script.js"></script>
+</body>
+</html>
