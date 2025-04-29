@@ -60,6 +60,15 @@ body {
    }
    
   
+   /* Phase 10: Style for main mic button when recording */
+   #mic-button.recording {
+       background-color: #dc3545; /* Red indicator */
+   }
+   #mic-button.recording:hover {
+       background-color: #c82333; /* Darker red on hover */
+   }
+   
+  
    #chat-input {
     flex-grow: 1; /* Allow textarea to take up remaining space */
     border: 1px solid #ccc;
@@ -377,6 +386,7 @@ body {
   
    #tts-text-input {
     width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding/border in width */
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 8px;
@@ -391,8 +401,9 @@ body {
   
    #tts-controls {
     display: flex;
-    justify-content: flex-start; /* Align buttons to the left */
+    justify-content: center; /* Center the buttons */
     align-items: center;
+    width: 100%; /* Make control area take full width */
    }
    
   
@@ -403,8 +414,22 @@ body {
     border-radius: 5px;
     padding: 8px 12px;
     cursor: pointer;
-    font-size: 1em;
-    margin-right: 5px; /* Space between buttons */
+    font-size: 1.1em; /* Slightly larger icon */
+    margin: 0 8px; /* Space around buttons */
+    width: 40px; /* Fixed width */
+    height: 40px; /* Fixed height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   }
+   
+  
+   /* Style for TTS mic button when recording */
+   #tts-mic-button.recording {
+     background-color: #dc3545; /* Red */
+   }
+   #tts-mic-button.recording:hover {
+     background-color: #c82333; /* Darker Red */
    }
    
   
@@ -413,7 +438,84 @@ body {
    }
    
   
-   #tts-audio-player {
-    /* Style for audio player or status */
-    margin-top: 10px;
+   /* Style for the generated speech/audio output area */
+   #tts-output-area {
+    margin-top: 5px;
+    max-height: 200px; /* Limit height */
+    overflow-y: auto; /* Add scrollbar if needed */
+    border: 1px solid #eee; /* Subtle border */
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9; /* Slightly different background */
+   }
+   
+  
+   /* Style for individual generated speech entries */
+   .tts-entry {
+    display: flex; /* Align text and button */
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #ddd; /* Separator */
+    margin-bottom: 5px;
+   }
+   
+  
+   .tts-entry:last-child {
+    border-bottom: none; /* Remove border for last item */
+   }
+   
+  
+   .tts-entry-text {
+    flex-grow: 1; /* Allow text to take up space */
+    margin-right: 10px; /* Space between text and button */
+    font-size: 0.95em;
+    word-break: break-word; /* Wrap long text */
+   }
+   
+  
+   .tts-replay-button {
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px; /* Smaller padding */
+    cursor: pointer;
+    font-size: 0.85em;
+    white-space: nowrap; /* Prevent button text wrapping */
+    flex-shrink: 0; /* Prevent button shrinking */
+   }
+   
+  
+   .tts-replay-button:hover {
+    background-color: #218838; /* Darker green */
+   }
+   
+  
+   .tts-replay-button i { /* Style for potential icon */
+    margin-right: 3px;
+   }
+   
+  
+   /* Style for recorded audio entries */
+   .tts-audio-entry {
+       display: flex;
+       align-items: center;
+       padding: 5px 0;
+       border-bottom: 1px dotted #ccc;
+       margin-bottom: 5px;
+   }
+   .tts-audio-entry:last-child {
+       border-bottom: none;
+   }
+   .tts-audio-entry audio { /* Style the HTML audio player */
+       flex-grow: 1;
+       height: 40px; /* Adjust player height */
+   }
+   .tts-audio-timestamp {
+       font-size: 0.75em;
+       color: #666;
+       margin-left: 10px;
+       white-space: nowrap;
+       flex-shrink: 0;
    }

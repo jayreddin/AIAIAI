@@ -48,8 +48,7 @@
  
 
   <div id="input-area">
-   <button id="mic-button" title="Microphone Input (Not Implemented Yet)">🎤</button>
-   <textarea id="chat-input" placeholder="Type your message here..." rows="1"></textarea>
+   <button id="mic-button" title="Microphone Input">🎤</button> <textarea id="chat-input" placeholder="Type your message here..." rows="1"></textarea>
    <button id="send-button" title="Send Message">➤</button>
   </div>
   </div>
@@ -85,11 +84,11 @@
   <div id="tts-input-area">
    <textarea id="tts-text-input" placeholder="Enter text to speak"></textarea>
    <div id="tts-controls">
-    <button id="tts-send-button">Speak</button>
-    <button id="tts-mic-button" title="Microphone Input (Not Implemented Yet)">🎤</button>
-   </div>
+    <button id="tts-send-button" title="Speak Text"><i class="fas fa-play"></i></button>
+    <button id="tts-mic-button" title="Record Audio"><i class="fas fa-microphone"></i></button> </div>
   </div>
-  <div id="tts-audio-player">
+  <div id="tts-output-heading" style="margin-top: 15px; font-weight: bold;">Generated Speech / Recordings:</div>
+  <div id="tts-output-area" style="margin-top: 5px; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px;">
    </div>
   <button class="close-popup-btn">Close</button>
   </div>
