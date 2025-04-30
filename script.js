@@ -103,7 +103,6 @@ const visionVideoPreview = document.getElementById('vision-video-preview');
 const visionControls = document.getElementById('vision-controls');
 const visionDescribeBtn = document.getElementById('vision-describe-btn');
 const visionStopCamBtn = document.getElementById('vision-stop-cam-btn');
-const visionFlipCamBtn = document.getElementById('vision-flip-cam-btn'); // Add flip camera button
 const visionStatus = document.getElementById('vision-status');
 const visionResultsText = document.getElementById('vision-results-text');
 const visionActions = document.getElementById('vision-actions');
@@ -1509,17 +1508,16 @@ async function handleOcrExtract() {
 // ... (initializeVisionPopup, startVisionCamera, stopVisionCamera, describeVisionFrame, clearVisionResults, saveVisionImage remain the same) ...
 function initializeVisionPopup() {
     if (visionListenersAdded) return;
-    const elements = [visionEnableCamBtn, visionVideoContainer, visionVideoPreview, visionControls, visionDescribeBtn, visionStopCamBtn, visionFlipCamBtn, visionStatus, visionResultsText, visionActions, visionClearBtn, visionSpeakBtn, visionCopyBtn, visionSaveImgBtn];
+    const elements = [visionEnableCamBtn, visionVideoContainer, visionVideoPreview, visionControls, visionDescribeBtn, visionStopCamBtn, visionStatus, visionResultsText, visionActions, visionClearBtn, visionSpeakBtn, visionCopyBtn, visionSaveImgBtn];
     if (elements.some(el => !el)) { console.error("Vision UI elements missing!"); return; }
 
     console.log("Initializing Vision listeners.");
     visionEnableCamBtn.addEventListener('click', startVisionCamera);
     visionStopCamBtn.addEventListener('click', stopVisionCamera);
-    visionFlipCamBtn.addEventListener('click', flipCamera); // Add flip camera listener
     visionDescribeBtn.addEventListener('click', describeVisionFrame);
     visionClearBtn.addEventListener('click', clearVisionResults);
     visionSpeakBtn.addEventListener('click', () => {
-        if (visionResultsText.value) speakMessage(visionResultsText.value, visionSpeakBtn);
+        if (visionResultsText.value) speakMessage(visionResultsText.value, visionSpeakBtn); // Re-use speak function
     });
     visionCopyBtn.addEventListener('click', () => {
         if (visionResultsText.value) navigator.clipboard.writeText(visionResultsText.value)
@@ -1531,9 +1529,6 @@ function initializeVisionPopup() {
     console.log("Vision listeners added.");
 }
 
-// Add currentFacingMode variable to track camera state
-let currentFacingMode = 'user'; // Start with front camera
-
 async function startVisionCamera() {
     if (!navigator.mediaDevices?.getUserMedia) { alert('Camera API not supported.'); return; }
     if (!visionVideoPreview || !visionEnableCamBtn || !visionVideoContainer || !visionControls || !visionStatus) return;
@@ -1541,29 +1536,23 @@ async function startVisionCamera() {
     visionStatus.style.display = 'block'; visionStatus.style.color = '#6c757d';
     visionEnableCamBtn.disabled = true;
     try {
-        visionStream = await navigator.mediaDevices.getUserMedia({ 
-            video: { 
-                facingMode: currentFacingMode,
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            } 
-        });
-        console.log("Camera stream obtained with facing mode:", currentFacingMode);
+        visionStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        console.log("Camera stream obtained.");
         visionVideoPreview.srcObject = visionStream;
         visionVideoPreview.onloadedmetadata = () => {
-            visionVideoPreview.play().catch(e => console.error("Video play failed:", e));
+            visionVideoPreview.play().catch(e => console.error("Video play failed:", e)); // Handle play promise rejection
             visionEnableCamBtn.style.display = 'none';
             visionVideoContainer.style.display = 'block';
             visionControls.style.display = 'block';
             visionStatus.style.display = 'none';
-            clearVisionResults();
+            clearVisionResults(); // Clear previous results when starting camera
             console.log("Camera preview started.");
         };
         visionVideoPreview.onerror = (e) => {
             console.error("Video preview error:", e);
             visionStatus.textContent = `Video error: ${e.message || 'Unknown'}`;
             visionStatus.style.color = 'red';
-            stopVisionCamera();
+            stopVisionCamera(); // Stop if video errors out
         };
     } catch (err) {
         console.error("Error accessing camera:", err);
@@ -1571,19 +1560,6 @@ async function startVisionCamera() {
         visionStatus.style.color = 'red';
         visionEnableCamBtn.disabled = false;
     }
-}
-
-async function flipCamera() {
-    if (!visionStream) return;
-    
-    // Toggle facing mode
-    currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
-    
-    // Stop current stream
-    stopVisionCamera();
-    
-    // Start new stream with flipped camera
-    await startVisionCamera();
 }
 
 function stopVisionCamera() {
