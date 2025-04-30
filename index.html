@@ -170,8 +170,10 @@
        </div>
        <div class="popup-content-area">
           <div id="vision-content">
-              <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px; justify-content: center;">
+              <div id="vision-enable-row" style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
                   <button id="vision-enable-cam-btn"><i class="fas fa-camera"></i> Enable Camera</button>
+              </div>
+              <div id="vision-active-row" style="display: none; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px;">
                   <button id="vision-stop-cam-btn"><i class="fas fa-stop-circle"></i> Stop Camera</button>
                   <button id="vision-flip-cam-btn"><i class="fas fa-sync-alt"></i> Flip Camera</button>
               </div>
@@ -179,7 +181,7 @@
                    <video id="vision-video-preview" playsinline autoplay muted style="width: 100%; height: 100%; display: block;"></video>
                </div>
               <div id="vision-controls" style="display: none; margin-bottom: 10px; text-align: center;">
-                  <button id="vision-describe-btn"><i class="fas fa-comment-dots"></i> Describe Frame</button>
+                  <button id="vision-describe-btn"><i class="fas fa-comment-dots"></i> Describe Image</button>
               </div>
               <div id="vision-status" style="text-align: center; margin: 10px 0; display: none;"></div>
               <textarea id="vision-results-text" placeholder="AI description will appear here..." rows="6" readonly style="margin-bottom: 10px;"></textarea>
@@ -191,7 +193,6 @@
               </div>
           </div>
        </div>
-      <button class="close-popup-btn">Close</button>
   </div>
 
   <div id="tts-popup" class="popup" style="display: none;">
