@@ -49,6 +49,9 @@
    <button id="ocr-btn" class="banner-button" title="OCR (Image to Text)"><i class="fas fa-file-alt"></i></button>
    <button id="vision-btn" class="banner-button" title="Vision (Camera)"><i class="fas fa-eye"></i></button>
    <button id="tts-btn" class="banner-button" title="Text-to-Speech Mode"><i class="fas fa-volume-up"></i></button>
+   <button id="search-btn" class="banner-button" title="Search Messages"><i class="fas fa-search"></i></button>
+   <button id="export-btn" class="banner-button" title="Export Conversation"><i class="fas fa-file-export"></i></button>
+   <button id="background-btn" class="banner-button" title="Change Background"><i class="fas fa-paint-brush"></i></button>
    <button id="settings-btn" class="banner-button" title="Settings"><i class="fas fa-cog"></i></button>
   </div>
 
@@ -58,6 +61,8 @@
    <textarea id="chat-input" placeholder="Type your message here..." rows="1"></textarea>
    <button id="send-button" title="Send Message">➤</button>
   </div>
+  
+  <div id="suggestion-container" class="suggestion-container"></div>
   </div>
   </main>
 
@@ -224,6 +229,7 @@
           <div id="settings-tabs">
               <button class="settings-tab-btn active" data-tab="models">Models</button>
               <button class="settings-tab-btn" data-tab="ui">UI</button>
+              <button class="settings-tab-btn" data-tab="features">Features</button>
               <button class="settings-tab-btn" data-tab="about">About</button>
           </div>
       </div>
@@ -257,9 +263,51 @@
                   <input type="range" id="settings-text-size" min="80" max="140" value="100" step="5">
                   <span id="settings-text-size-value">100%</span>
 
+                  <button id="settings-background-btn" style="margin-top: 15px;">Customize Chat Background</button>
+
                   <button id="settings-ui-save" style="margin-top: 15px;">Save UI Settings</button>
-                   <div id="settings-ui-status" class="settings-status"></div>
+                  <div id="settings-ui-status" class="settings-status"></div>
              </div>
+
+              <div id="settings-features-panel" class="settings-tab-panel">
+                  <h3>Feature Settings</h3>
+                  
+                  <div class="settings-feature-group">
+                      <h4>Message Features</h4>
+                      <div class="settings-feature-toggle">
+                          <input type="checkbox" id="settings-reactions-toggle" checked>
+                          <label for="settings-reactions-toggle">Message Reactions</label>
+                      </div>
+                      <div class="settings-feature-toggle">
+                          <input type="checkbox" id="settings-code-highlight-toggle" checked>
+                          <label for="settings-code-highlight-toggle">Code Syntax Highlighting</label>
+                      </div>
+                  </div>
+                  
+                  <div class="settings-feature-group">
+                      <h4>Input Assistance</h4>
+                      <div class="settings-feature-toggle">
+                          <input type="checkbox" id="settings-suggestions-toggle" checked>
+                          <label for="settings-suggestions-toggle">Show Auto-Suggestions</label>
+                      </div>
+                      <div class="settings-feature-toggle">
+                          <input type="checkbox" id="settings-voice-toggle" checked>
+                          <label for="settings-voice-toggle">Voice Input</label>
+                      </div>
+                  </div>
+                  
+                  <div class="settings-feature-group">
+                      <h4>Offline Support</h4>
+                      <div class="settings-feature-toggle">
+                          <input type="checkbox" id="settings-offline-toggle" checked>
+                          <label for="settings-offline-toggle">Enable Offline Mode</label>
+                      </div>
+                      <p class="settings-feature-description">When offline, messages will be queued and sent when you're back online.</p>
+                  </div>
+                  
+                  <button id="settings-features-save" style="margin-top: 15px;">Save Feature Settings</button>
+                  <div id="settings-features-status" class="settings-status"></div>
+              </div>
 
               <div id="settings-about-panel" class="settings-tab-panel">
                   <h3>About Puter AI Chat</h3>
@@ -269,8 +317,14 @@
                       <p>Powered by <a href="https://puter.com" target="_blank">Puter.com</a></p>
                       <p><a href="https://github.com/HeyPuter/puter" target="_blank">Puter on GitHub</a></p>
                       <p><a href="https://docs.puter.com" target="_blank">Puter.js Documentation</a></p>
+                      
+                      <div style="margin-top: 20px;">
+                          <h4>Tools</h4>
+                          <button id="export-conversation-btn" class="tool-button">Export Conversation</button>
+                          <button id="search-messages-btn" class="tool-button">Search Messages</button>
                       </div>
                   </div>
+              </div>
           </div>
       </div>
       <button class="close-popup-btn">Close</button>
@@ -285,6 +339,42 @@
       </div>
   </div>
 
+  <!-- Add New Popups For Features -->
+  <div id="search-popup" class="popup" style="display: none;">
+      <div class="popup-header">
+          <h2>Search Messages</h2>
+      </div>
+      <div class="popup-content-area">
+          <div id="search-content">
+              <!-- Search content will be populated by MessageSearch.createSearchUI() -->
+          </div>
+      </div>
+      <button class="close-popup-btn">Close</button>
+  </div>
+
+  <div id="export-popup" class="popup" style="display: none;">
+      <div class="popup-header">
+          <h2>Export Conversation</h2>
+      </div>
+      <div class="popup-content-area">
+          <div id="export-content">
+              <!-- Export content will be populated by ConversationExport.createExportUI() -->
+          </div>
+      </div>
+      <button class="close-popup-btn">Close</button>
+  </div>
+
+  <div id="background-popup" class="popup" style="display: none;">
+      <div class="popup-header">
+          <h2>Chat Background</h2>
+      </div>
+      <div class="popup-content-area">
+          <div id="background-content">
+              <!-- Background content will be populated by ChatBackgrounds.createBackgroundUI() -->
+          </div>
+      </div>
+      <button class="close-popup-btn">Close</button>
+  </div>
 
   <script src="https://js.puter.com/v2/"></script>
   <script type="module" src="script.js"></script>

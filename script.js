@@ -1,6 +1,9 @@
 // Puter AI Chat App Logic
 console.log("Puter AI Chat App script loaded.");
 
+// Import new features module
+import { NewFeatures } from './modules/new-features.js';
+
 // --- DOM Elements ---
 const signInButton = document.getElementById('signin-button');
 const signOutButton = document.getElementById('signout-button');
