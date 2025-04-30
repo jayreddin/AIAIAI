@@ -609,6 +609,7 @@ body {
     z-index: 10;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     transition: box-shadow 0.2s;
+    touch-action: none;
 }
 #vision-video-container.dragging {
     box-shadow: 0 4px 16px rgba(0,0,0,0.25), 0 0 0 2px #007bff;
@@ -683,4 +684,90 @@ body {
     color: green;
     font-size: 0.9em;
     height: 1.2em; /* Reserve space */
+}
+
+/* --- Themed Popups --- */
+.popup, .popup-header, .popup-content-area, .settings-tab-panel {
+    background-color: var(--background-color, #fff) !important;
+    color: var(--foreground-color, #111) !important;
+    border-color: var(--border-color, #111) !important;
+}
+
+/* Ensure buttons and inputs in popups use theme variables */
+.popup input, .popup textarea, .popup select {
+    background-color: var(--input-bg, #fff) !important;
+    color: var(--input-fg, #111) !important;
+    border-color: var(--border-color, #111) !important;
+}
+
+.popup button:not(.close-popup-btn):not(.banner-button):not(.action-button):not(.settings-tab-btn):not(.ocr-remove-thumb-btn):not(.img-gen-save-btn) {
+    background-color: var(--accent-color, #007bff) !important;
+    color: var(--foreground-color, #fff) !important;
+    border-color: var(--border-color, #007bff) !important;
+}
+
+.popup a {
+    color: var(--accent-color, #007bff) !important;
+}
+
+#chat-ui, #message-display, #bottom-banner, #input-area, .popup, .popup-header, .popup-content-area, .settings-tab-panel, .card-inputs, .img-gen-output-area, .img-gen-results-container, .img-gen-mode-panel, .tts-entry, .history-item, .vision-content, .ocr-content {
+    background-color: var(--background-color, #fff) !important;
+    color: var(--foreground-color, #111) !important;
+    border-color: var(--border-color, #111) !important;
+}
+
+input, textarea, select {
+    background-color: var(--input-bg, #fff) !important;
+    color: var(--input-fg, #111) !important;
+    border-color: var(--border-color, #111) !important;
+}
+
+button {
+    background-color: var(--accent-color, #007bff) !important;
+    color: var(--foreground-color, #fff) !important;
+    border-color: var(--border-color, #007bff) !important;
+}
+
+a {
+    color: var(--accent-color, #007bff) !important;
+}
+
+body.theme-dark {
+    --background-color: #000;
+    --foreground-color: #fff;
+    --primary-color: #181a1b;
+    --secondary-color: #23272a;
+    --accent-color: #7289da;
+    --border-color: #fff;
+    --input-bg: #181a1b;
+    --input-fg: #fff;
+}
+
+/* --- Vision Camera Preview: Touch Draggable/Resizable --- */
+#vision-video-container {
+    touch-action: none;
+}
+
+@media (pointer: coarse) {
+    #vision-video-container {
+        min-width: 120px;
+        min-height: 80px;
+        resize: both;
+    }
+    /* Make resize handle easier to grab on mobile */
+    #vision-video-container::after {
+        content: '';
+        position: absolute;
+        right: 0; bottom: 0;
+        width: 32px; height: 32px;
+        background: rgba(0,0,0,0.1);
+        border-bottom-right-radius: 5px;
+        z-index: 20;
+        pointer-events: none;
+    }
+}
+
+/* Prevent zoom on input focus for mobile */
+input, textarea, select {
+    font-size: 16px !important;
 }

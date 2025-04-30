@@ -1542,8 +1542,8 @@ function initializeVisionPopup() {
     visionVideoContainer.style.top = '0px';
     visionVideoContainer.style.cursor = 'move';
     
+    // Mouse events
     visionVideoContainer.addEventListener('mousedown', function(e) {
-        // Only left mouse button
         if (e.button !== 0) return;
         isDragging = true;
         visionVideoContainer.classList.add('dragging');
@@ -1562,7 +1562,6 @@ function initializeVisionPopup() {
         const containerRect = visionVideoContainer.getBoundingClientRect();
         let newLeft = e.clientX - popupRect.left - dragOffsetX;
         let newTop = e.clientY - popupRect.top - dragOffsetY;
-        // Clamp within popup
         newLeft = Math.max(0, Math.min(newLeft, popup.offsetWidth - containerRect.width));
         newTop = Math.max(0, Math.min(newTop, popup.offsetHeight - containerRect.height));
         visionVideoContainer.style.left = newLeft + 'px';
@@ -1573,14 +1572,39 @@ function initializeVisionPopup() {
         isDragging = false;
         document.body.style.userSelect = '';
     });
-    // Reset position when popup is closed
-    const visionPopup = document.getElementById('vision-popup');
-    if (visionPopup) {
-        visionPopup.addEventListener('hide', function() {
-            visionVideoContainer.style.left = '0px';
-            visionVideoContainer.style.top = '0px';
-        });
-    }
+    // Touch events for mobile
+    visionVideoContainer.addEventListener('touchstart', function(e) {
+        if (e.touches.length !== 1) return;
+        isDragging = true;
+        visionVideoContainer.classList.add('dragging');
+        const rect = visionVideoContainer.getBoundingClientRect();
+        dragOffsetX = e.touches[0].clientX - rect.left;
+        dragOffsetY = e.touches[0].clientY - rect.top;
+        initialLeft = visionVideoContainer.offsetLeft;
+        initialTop = visionVideoContainer.offsetTop;
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchmove', function(e) {
+        if (!isDragging || e.touches.length !== 1) return;
+        const popup = document.getElementById('vision-popup');
+        if (!popup) return;
+        const popupRect = popup.getBoundingClientRect();
+        const containerRect = visionVideoContainer.getBoundingClientRect();
+        let newLeft = e.touches[0].clientX - popupRect.left - dragOffsetX;
+        let newTop = e.touches[0].clientY - popupRect.top - dragOffsetY;
+        newLeft = Math.max(0, Math.min(newLeft, popup.offsetWidth - containerRect.width));
+        newTop = Math.max(0, Math.min(newTop, popup.offsetHeight - containerRect.height));
+        visionVideoContainer.style.left = newLeft + 'px';
+        visionVideoContainer.style.top = newTop + 'px';
+        e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchend', function(e) {
+        if (isDragging) visionVideoContainer.classList.remove('dragging');
+        isDragging = false;
+        document.body.style.userSelect = '';
+    });
+
     visionListenersAdded = true;
     console.log("Vision listeners added.");
 }
@@ -1738,6 +1762,11 @@ function initializeSettingsPopup() {
 
     console.log("Initializing Settings listeners and content.");
 
+    // Sync theme select dropdown to current theme
+    if (settingsThemeSelect && currentUISettings.theme) {
+        settingsThemeSelect.value = currentUISettings.theme;
+    }
+
     // Tab Switching Logic
     const tabButtons = settingsTabsContainer.querySelectorAll('.settings-tab-btn');
     const tabPanels = settingsTabContentContainer.querySelectorAll('.settings-tab-panel');
@@ -1865,7 +1894,7 @@ function applyUISettings(settings) {
      document.body.classList.add(`theme-${settings.theme || 'light'}`);
      console.log(`Applied theme: ${settings.theme || 'light'}`);
 
-     // Apply CSS variables for dark mode
+     // Apply CSS variables for each theme
      if ((settings.theme || 'light') === 'dark') {
          document.body.style.setProperty('--background-color', '#181a1b');
          document.body.style.setProperty('--foreground-color', '#e8eaed');
@@ -1875,6 +1904,24 @@ function applyUISettings(settings) {
          document.body.style.setProperty('--border-color', '#444950');
          document.body.style.setProperty('--input-bg', '#23272a');
          document.body.style.setProperty('--input-fg', '#e8eaed');
+     } else if ((settings.theme || 'light') === 'grey') {
+         document.body.style.setProperty('--background-color', '#4a4a4a');
+         document.body.style.setProperty('--foreground-color', '#ffffff');
+         document.body.style.setProperty('--primary-color', '#5a5a5a');
+         document.body.style.setProperty('--secondary-color', '#6a6a6a');
+         document.body.style.setProperty('--accent-color', '#bdbdbd');
+         document.body.style.setProperty('--border-color', '#888');
+         document.body.style.setProperty('--input-bg', '#5a5a5a');
+         document.body.style.setProperty('--input-fg', '#ffffff');
+     } else if ((settings.theme || 'light') === 'sunset') {
+         document.body.style.setProperty('--background-color', '#ff7b54');
+         document.body.style.setProperty('--foreground-color', '#ffffff');
+         document.body.style.setProperty('--primary-color', '#ff9770');
+         document.body.style.setProperty('--secondary-color', '#ffd56f');
+         document.body.style.setProperty('--accent-color', '#ffb26b');
+         document.body.style.setProperty('--border-color', '#ffb26b');
+         document.body.style.setProperty('--input-bg', '#ff9770');
+         document.body.style.setProperty('--input-fg', '#ffffff');
      } else {
          // Reset to default (light) theme variables
          document.body.style.setProperty('--background-color', '');
