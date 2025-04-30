@@ -359,10 +359,10 @@ function displayMessage(text, sender) {
         }
         bubble.appendChild(header);
         // Message text
-        const content = document.createElement('div');
-        content.className = 'message-content';
-        content.textContent = text;
-        bubble.appendChild(content);
+    const content = document.createElement('div');
+    content.className = 'message-content';
+    content.textContent = text;
+    bubble.appendChild(content);
         // Actions
         const actions = document.createElement('div');
         actions.className = 'message-actions';
@@ -413,7 +413,7 @@ async function sendMessage() {
             selectedModel = fallbackModel;
             if (modelSelector) modelSelector.value = selectedModel;
         } else {
-            displayMessage(`Error: No valid AI models are enabled in settings.`, 'system');
+             displayMessage(`Error: No valid AI models are enabled in settings.`, 'system');
             return;
         }
     }
@@ -895,8 +895,15 @@ async function handleBasicImageGeneration() {
     imgGenLoading.style.display = 'block';
     imgGenResults.innerHTML = '';
     try {
-        if (typeof puter === 'undefined' || !puter.ai?.txt2img) throw new Error("txt2img missing.");
-        const imageElement = await puter.ai.txt2img(prompt, false);
+        if (typeof puter === 'undefined' || !puter.ai?.txt2img) throw new Error("Image generation module missing. Please check your internet connection or reload the page.");
+        let imageElement;
+        try {
+            imageElement = await puter.ai.txt2img(prompt, false);
+        } catch (err) {
+            // Try test mode if real API fails
+            console.warn('Real API failed, trying test mode:', err);
+            imageElement = await puter.ai.txt2img(prompt, true);
+        }
         if (imageElement?.tagName === 'IMG') {
             displayGeneratedImage(imageElement, prompt, imgGenResults);
         } else { throw new Error("Invalid image element returned."); }
@@ -1082,15 +1089,15 @@ async function handleStoryGeneration() {
             const imgPrompt = `Illustration for a story chapter titled \"${chapterTitle}\". Setting: ${setting || 'unspecified'}. Characters: ${characters || 'unspecified'}. Style: Storybook illustration.`;
             try {
                 const imageElement = await puter.ai.txt2img(imgPrompt, false);
-                if (imageElement?.tagName === 'IMG') {
-                    imageElement.className = 'story-image';
-                    imageElement.alt = `Image for ${chapterTitle}`;
+                    if (imageElement?.tagName === 'IMG') {
+                        imageElement.className = 'story-image';
+                        imageElement.alt = `Image for ${chapterTitle}`;
                     imageElement.style.display = 'block';
                     imageElement.style.margin = '0 auto 12px auto';
-                    storyOutputArea.appendChild(imageElement);
-                }
-            } catch (imgError) {
-                console.error(`Error generating image for ${chapterTitle}:`, imgError);
+                        storyOutputArea.appendChild(imageElement);
+                    }
+                } catch (imgError) {
+                    console.error(`Error generating image for ${chapterTitle}:`, imgError);
                 const failMsg = document.createElement('div');
                 failMsg.textContent = '[Image generation failed for this chapter]';
                 failMsg.style.textAlign = 'center';
@@ -1525,6 +1532,55 @@ function initializeVisionPopup() {
             .catch(err => console.error("Vision copy failed:", err));
     });
     visionSaveImgBtn.addEventListener('click', saveVisionImage);
+
+    // --- Draggable Vision Video Container ---
+    let isDragging = false;
+    let dragOffsetX = 0, dragOffsetY = 0;
+    let initialLeft = 0, initialTop = 0;
+    visionVideoContainer.style.position = 'absolute';
+    visionVideoContainer.style.left = '0px';
+    visionVideoContainer.style.top = '0px';
+    visionVideoContainer.style.cursor = 'move';
+    
+    visionVideoContainer.addEventListener('mousedown', function(e) {
+        // Only left mouse button
+        if (e.button !== 0) return;
+        isDragging = true;
+        visionVideoContainer.classList.add('dragging');
+        const rect = visionVideoContainer.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        initialLeft = visionVideoContainer.offsetLeft;
+        initialTop = visionVideoContainer.offsetTop;
+        document.body.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        const popup = document.getElementById('vision-popup');
+        if (!popup) return;
+        const popupRect = popup.getBoundingClientRect();
+        const containerRect = visionVideoContainer.getBoundingClientRect();
+        let newLeft = e.clientX - popupRect.left - dragOffsetX;
+        let newTop = e.clientY - popupRect.top - dragOffsetY;
+        // Clamp within popup
+        newLeft = Math.max(0, Math.min(newLeft, popup.offsetWidth - containerRect.width));
+        newTop = Math.max(0, Math.min(newTop, popup.offsetHeight - containerRect.height));
+        visionVideoContainer.style.left = newLeft + 'px';
+        visionVideoContainer.style.top = newTop + 'px';
+    });
+    document.addEventListener('mouseup', function() {
+        if (isDragging) visionVideoContainer.classList.remove('dragging');
+        isDragging = false;
+        document.body.style.userSelect = '';
+    });
+    // Reset position when popup is closed
+    const visionPopup = document.getElementById('vision-popup');
+    if (visionPopup) {
+        visionPopup.addEventListener('hide', function() {
+            visionVideoContainer.style.left = '0px';
+            visionVideoContainer.style.top = '0px';
+        });
+    }
     visionListenersAdded = true;
     console.log("Vision listeners added.");
 }
