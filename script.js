@@ -113,6 +113,7 @@ const visionClearBtn = document.getElementById('vision-clear-btn');
 const visionSpeakBtn = document.getElementById('vision-speak-btn');
 const visionCopyBtn = document.getElementById('vision-copy-btn');
 const visionSaveImgBtn = document.getElementById('vision-save-img-btn');
+const visionFlipCamBtn = document.getElementById('vision-flip-cam-btn');
 
 // Phase 14 Elements (Settings)
 const settingsTabsContainer = document.getElementById('settings-tabs');
@@ -1536,12 +1537,182 @@ async function handleOcrExtract() {
 // ... (initializeVisionPopup, startVisionCamera, stopVisionCamera, describeVisionFrame, clearVisionResults, saveVisionImage remain the same) ...
 function initializeVisionPopup() {
     if (visionListenersAdded) return;
-    const elements = [visionEnableCamBtn, visionVideoContainer, visionVideoPreview, visionControls, visionDescribeBtn, visionStopCamBtn, visionStatus, visionResultsText, visionActions, visionClearBtn, visionSpeakBtn, visionCopyBtn, visionSaveImgBtn];
+    const elements = [visionEnableCamBtn, visionVideoContainer, visionVideoPreview, visionControls, visionDescribeBtn, visionStopCamBtn, visionStatus, visionResultsText, visionActions, visionClearBtn, visionSpeakBtn, visionCopyBtn, visionSaveImgBtn, visionFlipCamBtn];
     if (elements.some(el => !el)) { console.error("Vision UI elements missing!"); return; }
 
     // New layout elements
     const visionEnableRow = document.getElementById('vision-enable-row');
     const visionActiveRow = document.getElementById('vision-active-row');
+
+    // Initialize drag variables
+    let isDragging = false;
+    let dragOffsetX = 0, dragOffsetY = 0;
+    let initialLeft = 0, initialTop = 0;
+    let lastDragX = 0, lastDragY = 0;
+    let velocityX = 0, velocityY = 0;
+    let inertiaFrame = null;
+    let isPinching = false;
+    let initialDistance = 0;
+    let initialWidth = 0, initialHeight = 0;
+    let aspectRatio = 1;
+
+    // Make the preview absolutely positioned relative to the viewport
+    visionVideoContainer.style.position = 'fixed';
+    visionVideoContainer.style.left = '0px';
+    visionVideoContainer.style.top = '0px';
+    visionVideoContainer.style.cursor = 'move';
+
+    // Helper: Clamp preview within viewport
+    function clampToViewport(left, top, width, height) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        left = Math.max(0, Math.min(left, vw - width));
+        top = Math.max(0, Math.min(top, vh - height));
+        return [left, top];
+    }
+
+    // Mouse drag
+    visionVideoContainer.addEventListener('mousedown', function(e) {
+        if (e.button !== 0 || e.target.classList.contains('vision-resize-handle')) return;
+        isDragging = true;
+        visionVideoContainer.classList.add('dragging');
+        const rect = visionVideoContainer.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        initialLeft = rect.left;
+        initialTop = rect.top;
+        lastDragX = e.clientX;
+        lastDragY = e.clientY;
+        aspectRatio = rect.width / rect.height;
+        document.body.style.userSelect = 'none';
+        if (inertiaFrame) cancelAnimationFrame(inertiaFrame);
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        const width = visionVideoContainer.offsetWidth;
+        const height = visionVideoContainer.offsetHeight;
+        let newLeft = e.clientX - dragOffsetX;
+        let newTop = e.clientY - dragOffsetY;
+        [newLeft, newTop] = clampToViewport(newLeft, newTop, width, height);
+        visionVideoContainer.style.left = newLeft + 'px';
+        visionVideoContainer.style.top = newTop + 'px';
+        velocityX = e.clientX - lastDragX;
+        velocityY = e.clientY - lastDragY;
+        lastDragX = e.clientX;
+        lastDragY = e.clientY;
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isDragging) visionVideoContainer.classList.remove('dragging');
+        if (isDragging && (Math.abs(velocityX) > 1 || Math.abs(velocityY) > 1)) {
+            // Inertia
+            let left = parseFloat(visionVideoContainer.style.left);
+            let top = parseFloat(visionVideoContainer.style.top);
+            const width = visionVideoContainer.offsetWidth;
+            const height = visionVideoContainer.offsetHeight;
+            function glide() {
+                left += velocityX;
+                top += velocityY;
+                [left, top] = clampToViewport(left, top, width, height);
+                visionVideoContainer.style.left = left + 'px';
+                visionVideoContainer.style.top = top + 'px';
+                velocityX *= 0.92;
+                velocityY *= 0.92;
+                if (Math.abs(velocityX) > 0.5 || Math.abs(velocityY) > 0.5) {
+                    inertiaFrame = requestAnimationFrame(glide);
+                }
+            }
+            inertiaFrame = requestAnimationFrame(glide);
+        }
+        isDragging = false;
+        document.body.style.userSelect = '';
+    });
+
+    // Touch drag & pinch
+    visionVideoContainer.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+            isDragging = true;
+            visionVideoContainer.classList.add('dragging');
+            const rect = visionVideoContainer.getBoundingClientRect();
+            dragOffsetX = e.touches[0].clientX - rect.left;
+            dragOffsetY = e.touches[0].clientY - rect.top;
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            lastDragX = e.touches[0].clientX;
+            lastDragY = e.touches[0].clientY;
+            aspectRatio = rect.width / rect.height;
+            document.body.style.userSelect = 'none';
+            if (inertiaFrame) cancelAnimationFrame(inertiaFrame);
+        } else if (e.touches.length === 2) {
+            isPinching = true;
+            isDragging = false;
+            const rect = visionVideoContainer.getBoundingClientRect();
+            initialWidth = rect.width;
+            initialHeight = rect.height;
+            aspectRatio = rect.width / rect.height;
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            initialDistance = Math.sqrt(dx * dx + dy * dy);
+        }
+        e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener('touchmove', function(e) {
+        if (isDragging && e.touches.length === 1) {
+            const width = visionVideoContainer.offsetWidth;
+            const height = visionVideoContainer.offsetHeight;
+            let newLeft = e.touches[0].clientX - dragOffsetX;
+            let newTop = e.touches[0].clientY - dragOffsetY;
+            [newLeft, newTop] = clampToViewport(newLeft, newTop, width, height);
+            visionVideoContainer.style.left = newLeft + 'px';
+            visionVideoContainer.style.top = newTop + 'px';
+            velocityX = e.touches[0].clientX - lastDragX;
+            velocityY = e.touches[0].clientY - lastDragY;
+            lastDragX = e.touches[0].clientX;
+            lastDragY = e.touches[0].clientY;
+        } else if (isPinching && e.touches.length === 2) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            let scale = dist / initialDistance;
+            let newWidth = Math.max(60, Math.min(window.innerWidth, initialWidth * scale));
+            let newHeight = newWidth / aspectRatio;
+            visionVideoContainer.style.width = newWidth + 'px';
+            visionVideoContainer.style.height = newHeight + 'px';
+        }
+        e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener('touchend', function(e) {
+        if (isDragging) visionVideoContainer.classList.remove('dragging');
+        if (isDragging && (Math.abs(velocityX) > 1 || Math.abs(velocityY) > 1)) {
+            // Inertia
+            let left = parseFloat(visionVideoContainer.style.left);
+            let top = parseFloat(visionVideoContainer.style.top);
+            const width = visionVideoContainer.offsetWidth;
+            const height = visionVideoContainer.offsetHeight;
+            function glide() {
+                left += velocityX;
+                top += velocityY;
+                [left, top] = clampToViewport(left, top, width, height);
+                visionVideoContainer.style.left = left + 'px';
+                visionVideoContainer.style.top = top + 'px';
+                velocityX *= 0.92;
+                velocityY *= 0.92;
+                if (Math.abs(velocityX) > 0.5 || Math.abs(velocityY) > 0.5) {
+                    inertiaFrame = requestAnimationFrame(glide);
+                }
+            }
+            inertiaFrame = requestAnimationFrame(glide);
+        }
+        isDragging = false;
+        isPinching = false;
+        document.body.style.userSelect = '';
+    });
+
+    // Add resize handle
+    addResizeHandleToVisionContainer();
 
     function setCameraUIState(active) {
         if (active) {
