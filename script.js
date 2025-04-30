@@ -1529,6 +1529,19 @@ function initializeVisionPopup() {
     console.log("Vision listeners added.");
 }
 
+let visionFacingMode = 'user'; // Default to front camera
+
+const visionFlipCamBtn = document.getElementById('vision-flip-cam-btn');
+if (visionFlipCamBtn) {
+    visionFlipCamBtn.addEventListener('click', () => {
+        visionFacingMode = (visionFacingMode === 'user') ? 'environment' : 'user';
+        if (visionStream) {
+            stopVisionCamera();
+        }
+        startVisionCamera();
+    });
+}
+
 async function startVisionCamera() {
     if (!navigator.mediaDevices?.getUserMedia) { alert('Camera API not supported.'); return; }
     if (!visionVideoPreview || !visionEnableCamBtn || !visionVideoContainer || !visionControls || !visionStatus) return;
@@ -1536,7 +1549,7 @@ async function startVisionCamera() {
     visionStatus.style.display = 'block'; visionStatus.style.color = '#6c757d';
     visionEnableCamBtn.disabled = true;
     try {
-        visionStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        visionStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: visionFacingMode } });
         console.log("Camera stream obtained.");
         visionVideoPreview.srcObject = visionStream;
         visionVideoPreview.onloadedmetadata = () => {
@@ -1554,6 +1567,9 @@ async function startVisionCamera() {
             visionStatus.style.color = 'red';
             stopVisionCamera(); // Stop if video errors out
         };
+        // Make video preview resize with container
+        visionVideoPreview.style.width = '100%';
+        visionVideoPreview.style.height = '100%';
     } catch (err) {
         console.error("Error accessing camera:", err);
         visionStatus.textContent = `Error accessing camera: ${err.name}. Check permissions.`;
