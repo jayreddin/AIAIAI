@@ -63,7 +63,7 @@ const storyGenerateBtn = document.getElementById('story-generate-btn');
 const storyDownloadBtn = document.getElementById('story-download-btn');
 const storyOutputArea = document.getElementById('story-output');
 const cardTypeSelect = document.getElementById('card-type');
-const cardVisualDescInput = document.getElementById('card-visual-desc');
+const cardVisualDescInput = document.getElementById('card-visual-desc-input');
 const cardGenerateImgBtn = document.getElementById('card-generate-img-btn');
 const cardSearchImgBtn = document.getElementById('card-search-img-btn');
 const cardImagePreviewArea = document.getElementById('card-image-preview-area');
@@ -129,6 +129,15 @@ const settingsUIStatus = document.getElementById('settings-ui-status');
 const settingsAboutPanel = document.getElementById('settings-about-panel');
 const settingsAboutContent = document.getElementById('settings-about-content');
 
+// Remove duplicate/old Card tab element declarations and update to match new HTML IDs
+// const cardTitleInput = document.getElementById('card-title-input');
+// const cardVisualDescInput = document.getElementById('card-visual-desc-input');
+// const cardSearchImgBtn = document.getElementById('card-search-img-btn');
+// const cardImageSearchResults = document.getElementById('card-image-search-results');
+// const cardGenerateBtn = document.getElementById('card-generate-btn');
+//const cardDownloadBtn = document.getElementById('card-download-btn');
+const cardDataPrepared = document.getElementById('card-data-prepared');
+const cardPreview = document.getElementById('card-preview');
 
 // --- App State ---
 let selectedModel = 'gpt-4o-mini';
@@ -326,22 +335,35 @@ function displayMessage(text, sender) {
     if (!messageDisplay) { console.error("Msg display missing!"); return; }
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';
-    const content = document.createElement('div');
-    content.className = 'message-content';
-    content.textContent = text;
-    const timestamp = document.createElement('div');
-    timestamp.className = 'timestamp';
-    timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    bubble.appendChild(content);
-    bubble.appendChild(timestamp);
-    if (sender === 'user') bubble.classList.add('user-bubble');
-    else if (sender === 'ai') bubble.classList.add('ai-bubble');
-    else {
-        bubble.classList.add('system-bubble');
-        bubble.id = text.toLowerCase().includes('thinking') ? 'loading-indicator' : '';
-        if (bubble.contains(timestamp)) bubble.removeChild(timestamp);
-    }
-    if (sender !== 'system') {
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    if (sender === 'user' || sender === 'ai') {
+        // Header row: name and timestamp
+        const header = document.createElement('div');
+        header.className = 'bubble-header';
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'bubble-name';
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'bubble-timestamp';
+        timeSpan.textContent = now;
+        if (sender === 'user') {
+            nameSpan.textContent = usernameDisplay?.textContent || 'User';
+            header.appendChild(timeSpan); // timestamp left
+            header.appendChild(nameSpan); // username right
+            bubble.classList.add('user-bubble');
+        } else {
+            nameSpan.textContent = selectedModel;
+            header.appendChild(nameSpan); // model left
+            header.appendChild(timeSpan); // timestamp right
+            bubble.classList.add('ai-bubble');
+        }
+        bubble.appendChild(header);
+        // Message text
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        content.textContent = text;
+        bubble.appendChild(content);
+        // Actions
         const actions = document.createElement('div');
         actions.className = 'message-actions';
         const resendBtn = createActionButton('Resend', 'fas fa-redo');
@@ -354,6 +376,14 @@ function displayMessage(text, sender) {
         copyBtn.onclick = () => copyMessage(text, content);
         delBtn.onclick = () => deleteMessage(bubble);
         speakBtn.onclick = (e) => speakMessage(text, e.currentTarget);
+    } else {
+        // System message (centered, no border)
+        bubble.classList.add('system-bubble');
+        bubble.id = text.toLowerCase().includes('thinking') ? 'loading-indicator' : '';
+        const sysContent = document.createElement('div');
+        sysContent.className = 'message-content';
+        sysContent.textContent = text;
+        bubble.appendChild(sysContent);
     }
     messageDisplay.appendChild(bubble);
     requestAnimationFrame(() => {
@@ -954,7 +984,7 @@ async function handleStoryGeneration() {
         if (characters) storyPrompt += `- Characters: ${characters}\n`;
         if (setting) storyPrompt += `- Setting: ${setting}\n`;
         storyPrompt += `- Plot: ${plot}\n\n`;
-        storyPrompt += `Structure the story with clear chapter headings (e.g., "Chapter 1: The Beginning") and paragraphs. Keep it concise.`;
+        storyPrompt += `Structure the story with clear chapter headings (e.g., "Chapter 1: The Beginning") and paragraphs. Keep it concise. Title the story at the top.`;
 
         console.log("Requesting story text...");
         const storyResponse = await puter.ai.chat(storyPrompt, { model: selectedModel });
@@ -962,66 +992,166 @@ async function handleStoryGeneration() {
         console.log("Story text received.");
 
         // 2. Process Text and Generate Images
-        storyOutputArea.innerHTML = ''; // Clear loading
-        const lines = storyText.split('\n').filter(line => line.trim() !== '');
+        storyOutputArea.innerHTML = '';
+        let lines = storyText.split('\n').filter(line => line.trim() !== '');
+        let contentGenerated = false;
+        let currentChapter = null;
+        let chapterParagraphs = [];
+        let chapterTitle = '';
+        let storyTitle = '';
+        let isFirstHeading = true;
         let chapterCount = 0;
-        let contentGenerated = false; // Track if anything was added
 
-        for (const line of lines) {
+        // Find the first non-empty line as the story title, fallback if not found
+        let foundTitle = false;
+        for (let i = 0; i < lines.length; i++) {
+            if (!lines[i].toLowerCase().startsWith('chapter ')) {
+                storyTitle = lines[i].trim();
+                lines = lines.slice(i + 1);
+                foundTitle = true;
+                break;
+            }
+        }
+        if (!foundTitle) {
+            storyTitle = 'AI Generated Story';
+        }
+
+        // Title centered at the top
+        if (storyTitle) {
+            const titleElem = document.createElement('h2');
+            titleElem.textContent = storyTitle;
+            titleElem.style.textAlign = 'center';
+            titleElem.style.marginBottom = '18px';
+            storyOutputArea.appendChild(titleElem);
+        }
+
+        // Fallback: If no chapters, treat all as one chapter
+        let hasChapters = lines.some(line => line.toLowerCase().startsWith('chapter '));
+        if (!hasChapters) {
+            lines = ['Chapter 1', ...lines];
+        }
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
             if (line.toLowerCase().startsWith('chapter ')) {
-                contentGenerated = true;
-                chapterCount++;
-                const chapterTitle = line.trim();
-                const h3 = document.createElement('h3');
-                h3.textContent = chapterTitle;
-                storyOutputArea.appendChild(h3);
-
-                // Generate an image for the chapter
-                const imgPrompt = `Illustration for a story chapter titled "${chapterTitle}". Setting: ${setting || 'unspecified'}. Characters: ${characters || 'unspecified'}. Style: Storybook illustration.`;
-                console.log(`Generating image for ${chapterTitle}...`);
-                try {
-                    // testMode=true
-                    const imageElement = await puter.ai.txt2img(imgPrompt, true); //
-                    if (imageElement?.tagName === 'IMG') {
-                        imageElement.className = 'story-image';
-                        imageElement.alt = `Image for ${chapterTitle}`;
-                        storyOutputArea.appendChild(imageElement);
-                    }
-                } catch (imgError) {
-                    console.error(`Error generating image for ${chapterTitle}:`, imgError);
-                    storyOutputArea.appendChild(document.createTextNode(`[Image generation failed for this chapter]`));
+                // If we have a previous chapter, render it
+                if (currentChapter) {
+                    await renderChapter(currentChapter, chapterParagraphs, chapterTitle);
                 }
-
+                // Start new chapter
+                chapterCount++;
+                currentChapter = line.trim();
+                chapterTitle = line.trim();
+                chapterParagraphs = [];
             } else {
-                // Assume it's a paragraph
-                contentGenerated = true;
+                chapterParagraphs.push(line.trim());
+            }
+        }
+        // Render the last chapter
+        if (currentChapter) {
+            await renderChapter(currentChapter, chapterParagraphs, chapterTitle);
+        }
+
+        async function renderChapter(chapterHeading, paragraphs, chapterTitle) {
+            contentGenerated = true;
+            // Subheading (centered)
+            const subheading = document.createElement('h3');
+            subheading.textContent = chapterHeading;
+            subheading.style.textAlign = 'center';
+            subheading.style.margin = '16px 0 8px 0';
+            storyOutputArea.appendChild(subheading);
+            // Chapter text (all paragraphs)
+            const paraDiv = document.createElement('div');
+            paraDiv.style.marginBottom = '8px';
+            for (const pText of paragraphs) {
                 const p = document.createElement('p');
                 p.className = 'story-paragraph';
-                p.textContent = line.trim();
-                storyOutputArea.appendChild(p);
+                p.textContent = pText;
+                paraDiv.appendChild(p);
             }
-            // Add a small delay between image generations if needed (optional)
-            // await new Promise(resolve => setTimeout(resolve, 500));
+            storyOutputArea.appendChild(paraDiv);
+            // Line break
+            storyOutputArea.appendChild(document.createElement('br'));
+            // Loading spinner for image
+            const spinner = document.createElement('div');
+            spinner.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            spinner.style.textAlign = 'center';
+            spinner.style.margin = '8px 0';
+            storyOutputArea.appendChild(spinner);
+            // Generate image for this chapter
+            const imgPrompt = `Illustration for a story chapter titled \"${chapterTitle}\". Setting: ${setting || 'unspecified'}. Characters: ${characters || 'unspecified'}. Style: Storybook illustration.`;
+            try {
+                const imageElement = await puter.ai.txt2img(imgPrompt, true);
+                if (imageElement?.tagName === 'IMG') {
+                    imageElement.className = 'story-image';
+                    imageElement.alt = `Image for ${chapterTitle}`;
+                    imageElement.style.display = 'block';
+                    imageElement.style.margin = '0 auto 12px auto';
+                    storyOutputArea.appendChild(imageElement);
+                }
+            } catch (imgError) {
+                console.error(`Error generating image for ${chapterTitle}:`, imgError);
+                const failMsg = document.createElement('div');
+                failMsg.textContent = '[Image generation failed for this chapter]';
+                failMsg.style.textAlign = 'center';
+                failMsg.style.color = 'red';
+                storyOutputArea.appendChild(failMsg);
+            } finally {
+                storyOutputArea.removeChild(spinner);
+            }
+            // Line break
+            storyOutputArea.appendChild(document.createElement('br'));
         }
 
         if (contentGenerated) {
-            storyDownloadBtn.style.display = 'inline-block'; // Show download button
+            storyDownloadBtn.style.display = 'inline-block';
         } else {
             storyOutputArea.innerHTML = '<p>Could not generate story content.</p>';
         }
 
     } catch (error) {
         console.error("Error generating story:", error);
-        storyOutputArea.innerHTML = `<p style="color: red;">Error generating story: ${error.message}</p>`;
+        storyOutputArea.innerHTML = `<p style=\"color: red;\">Error generating story: ${error.message}</p>`;
     } finally {
         storyGenerateBtn.disabled = false;
     }
 }
 
+// Download story as PDF
 function handleStoryDownload() {
-    // Placeholder for PDF generation using jsPDF or similar
-    alert("PDF Download for Story mode is not yet implemented.");
-    console.log("Attempting to download story - PDF logic needed.");
+    if (!storyOutputArea) return;
+    const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4' });
+    let y = 40;
+    const margin = 40;
+    const maxWidth = 515;
+    const elements = Array.from(storyOutputArea.children);
+    elements.forEach(el => {
+        if (el.tagName === 'H2' || el.tagName === 'H3') {
+            doc.setFontSize(el.tagName === 'H2' ? 20 : 16);
+            doc.text(el.textContent, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            y += el.tagName === 'H2' ? 32 : 24;
+        } else if (el.tagName === 'P') {
+            doc.setFontSize(12);
+            const lines = doc.splitTextToSize(el.textContent, maxWidth);
+            lines.forEach(line => {
+                doc.text(line, margin, y);
+                y += 16;
+            });
+        } else if (el.tagName === 'IMG') {
+            const img = el;
+            const imgWidth = Math.min(img.naturalWidth, maxWidth);
+            const imgHeight = img.naturalHeight * (imgWidth / img.naturalWidth);
+            doc.addImage(img.src, 'JPEG', margin, y, imgWidth, imgHeight);
+            y += imgHeight + 12;
+        } else if (el.tagName === 'BR') {
+            y += 8;
+        }
+        if (y > doc.internal.pageSize.getHeight() - 60) {
+            doc.addPage();
+            y = 40;
+        }
+    });
+    doc.save('story.pdf');
 }
 
 // ---- Card Mode Logic ----
@@ -1197,26 +1327,56 @@ function handleComicDownload() {
 
 function initializeImageGenPopup() {
     if (imgGenListenersAdded) return;
-    const elements = [imgGenGenerateBtn, imgGenPrompt, imgGenModeButtonsContainer, imgGenModePanelsContainer, imageModalSaveBtn, imageModalCloseBtn, imageModalBackdrop, storyGenerateBtn, storyDownloadBtn, cardGenerateImgBtn, cardSearchImgBtn, cardGenerateBtn, cardDownloadBtn, cardSizeSelect, comicGenerateBtn, comicDownloadBtn];
+    // Update the elements list to match the current HTML structure
+    const elements = [
+        imgGenGenerateBtn, 
+        imgGenPrompt, 
+        imgGenModeButtonsContainer, 
+        imgGenModePanelsContainer, 
+        imageModalSaveBtn, 
+        imageModalCloseBtn, 
+        imageModalBackdrop, 
+        storyGenerateBtn, 
+        storyDownloadBtn,
+        cardVisualDescInput,
+        cardSearchImgBtn,
+        cardGenerateBtn,
+        cardDownloadBtn,
+        cardImageSearchResults,
+        comicGenerateBtn,
+        comicDownloadBtn
+    ];
+    
     if (elements.some(el => !el)) {
-        console.warn("Some Img Gen elements missing."); return;
+        console.warn("Some Img Gen elements missing.");
+        // Log which elements are missing for debugging
+        elements.forEach((el, index) => {
+            if (!el) {
+                console.warn(`Missing element at index ${index}:`, elements[index]);
+            }
+        });
+        return;
     }
+    
     console.log("Initializing Img Gen listeners.");
 
     // Basic Mode
     imgGenGenerateBtn.addEventListener('click', handleBasicImageGeneration);
-    imgGenPrompt.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleBasicImageGeneration(); } });
+    imgGenPrompt.addEventListener('keypress', (e) => { 
+        if (e.key === 'Enter' && !e.shiftKey) { 
+            e.preventDefault(); 
+            handleBasicImageGeneration(); 
+        } 
+    });
 
     // Story Mode
     storyGenerateBtn.addEventListener('click', handleStoryGeneration);
     storyDownloadBtn.addEventListener('click', handleStoryDownload);
 
     // Card Mode
-    cardGenerateImgBtn.addEventListener('click', handleCardImageGeneration);
     cardSearchImgBtn.addEventListener('click', handleCardImageSearch);
     cardGenerateBtn.addEventListener('click', handleCardGeneration);
     cardDownloadBtn.addEventListener('click', handleCardDownload);
-    cardSizeSelect.addEventListener('change', (e) => { if(cardCustomSizeInputs) cardCustomSizeInputs.style.display = e.target.value === 'custom' ? 'block' : 'none'; });
 
     // Comic Mode
     comicGenerateBtn.addEventListener('click', handleComicGeneration);
@@ -1232,9 +1392,11 @@ function initializeImageGenPopup() {
             modeButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
             modePanels.forEach(panel => panel.classList.toggle('active', panel.id === `img-gen-${mode}-mode`));
-            document.getElementById('img-gen-basic-results-area').style.display = (mode === 'basic') ? 'block' : 'none'; // Show basic results only in basic mode
+            document.getElementById('img-gen-basic-results-area').style.display = (mode === 'basic') ? 'block' : 'none';
             currentImageGenMode = mode;
             console.log("Img Gen mode switched to:", mode);
+            // Update footer button visibility
+            updateImgGenFooterButton();
         });
     });
 
@@ -1983,4 +2145,73 @@ function requireSignIn() {
         return false;
     }
     return true;
+}
+
+// --- Image Generation Popup Tab Switching and Button Visibility ---
+function updateImgGenFooterButton() {
+    const storyTab = document.getElementById('img-gen-story-mode');
+    const storyBtn = document.getElementById('story-generate-btn');
+    const basicTab = document.getElementById('img-gen-basic-mode');
+    const cardTab = document.getElementById('img-gen-card-mode');
+    const comicTab = document.getElementById('img-gen-comic-mode');
+    const activePanel = document.querySelector('.img-gen-mode-panel.active');
+    if (activePanel === storyTab) {
+        storyBtn.style.display = '';
+    } else {
+        storyBtn.style.display = 'none';
+    }
+    // Center the Generate button in Basic tab
+    const basicGenBtn = document.getElementById('img-gen-generate-btn');
+    if (activePanel === basicTab && basicGenBtn) {
+        basicGenBtn.style.display = 'block';
+        basicGenBtn.style.margin = '0 auto';
+    } else if (basicGenBtn) {
+        basicGenBtn.style.display = '';
+        basicGenBtn.style.margin = '';
+    }
+}
+
+// Patch tab switching to update footer button
+const imgGenModes = document.getElementById('img-gen-modes');
+if (imgGenModes) {
+    imgGenModes.addEventListener('click', updateImgGenFooterButton);
+}
+document.addEventListener('DOMContentLoaded', updateImgGenFooterButton);
+
+// Also update on popup open
+const imgGenPopup = document.getElementById('img-gen-popup');
+if (imgGenPopup) {
+    imgGenPopup.addEventListener('show', updateImgGenFooterButton);
+}
+
+// --- Card Tab: Search Card Image and Download Card Button ---
+// Use already declared variables at the top of the file
+// const cardSearchImgBtn = document.getElementById('card-search-img-btn');
+// const cardImageSearchResults = document.getElementById('card-image-search-results');
+// const cardGenerateBtn = document.getElementById('card-generate-btn');
+// const cardDownloadBtn = document.getElementById('card-download-btn');
+
+if (cardSearchImgBtn) {
+    cardSearchImgBtn.onclick = async function() {
+        const query = cardVisualDescInput.value.trim();
+        if (!query) { alert('Please enter a visual description to search.'); return; }
+        cardImageSearchResults.innerHTML = '<div style="text-align:center;padding:10px;"><i class="fas fa-spinner fa-spin"></i> Searching images...</div>';
+        // Simulate search with placeholder images
+        setTimeout(() => {
+            cardImageSearchResults.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const img = document.createElement('img');
+                img.src = `https://placehold.co/120x80?text=Card+${i+1}`;
+                img.alt = `Card Search Result ${i+1}`;
+                img.onclick = () => selectCardImage(img);
+                cardImageSearchResults.appendChild(img);
+            }
+        }, 1200);
+    };
+}
+
+if (cardDownloadBtn) {
+    cardDownloadBtn.onclick = function() {
+        alert('PDF/Image Download for Card mode is not yet implemented.');
+    };
 }

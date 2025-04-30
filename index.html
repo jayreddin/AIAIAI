@@ -110,29 +110,23 @@
                       <label for="story-plot">Plot Summary:</label>
                       <textarea id="story-plot" placeholder="Describe the story chapter by chapter or scene by scene..." rows="4"></textarea>
                       <div class="img-gen-buttons">
-                          <button id="story-generate-btn">Generate Story</button>
-                          <button id="story-download-btn" style="display: none;">Download Story (PDF - TBD)</button>
+                          <button id="story-download-btn" style="display: none;">Download Story (PDF)</button>
                       </div>
                       <div id="story-output" class="img-gen-output-area"></div>
                   </div>
                   <div id="img-gen-card-mode" class="img-gen-mode-panel">
-                      <label for="card-type">Type:</label>
-                      <select id="card-type"> <option value="birthday">Birthday</option> <option value="thankyou">Thank You</option> <option value="holiday">Holiday</option> <option value="congrats">Congratulations</option> <option value="getwell">Get Well Soon</option> <option value="custom">Custom</option> </select>
-                      <label for="card-visual-desc">Visual Description (for image):</label>
-                      <textarea id="card-visual-desc" placeholder="Describe the image for the card front..." rows="3"></textarea>
-                      <div class="card-image-controls"> <button id="card-generate-img-btn">Generate Card Image</button> <button id="card-search-img-btn">Search Card Image (TBD)</button> </div>
-                      <div id="card-image-preview-area"> <div id="card-image-loading" style="display: none; text-align: center; padding: 10px;">Loading images... <i class="fas fa-spinner fa-spin"></i></div> <div id="card-image-search-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 5px;"></div> </div>
-                      <div id="card-selected-image-display" style="margin-top: 10px; text-align: center; display:none;"> <p style="margin-bottom: 5px;">Selected Image:</p> <img id="card-selected-image-thumb" src="#" alt="Selected Card Image" style="max-width: 150px; max-height: 100px; border: 1px solid #ccc;"> </div>
-                      <label for="card-recipient">Recipient:</label>
-                      <input type="text" id="card-recipient" placeholder="E.g., Mom, John Doe">
-                      <label for="card-message">Message:</label>
-                      <textarea id="card-message" placeholder="Write your message here..." rows="3"></textarea>
-                      <label for="card-sender">Your Name:</label>
-                      <input type="text" id="card-sender" placeholder="E.g., From Jane">
-                      <label for="card-size">Card Size (Folded):</label>
-                      <select id="card-size"> <option value="A2">A2 (4.25" x 5.5")</option> <option value="A6">A6 (4.625" x 6.25")</option> <option value="A7">A7 (5" x 7")</option> <option value="SQ5">Square (5" x 5")</option> <option value="custom">Custom Size</option> </select>
-                      <div id="card-custom-size-inputs" style="display: none; margin-top: 5px;"> <label for="card-custom-width">Width (in):</label> <input type="number" id="card-custom-width" step="0.1" min="1"> <label for="card-custom-height">Height (in):</label> <input type="number" id="card-custom-height" step="0.1" min="1"> </div>
-                      <div class="img-gen-buttons"> <button id="card-generate-btn">Generate Card Data</button> <button id="card-download-btn" style="display: none;">Download Card (PDF/IMG - TBD)</button> </div>
+                      <div class="card-inputs">
+                          <input id="card-title-input" placeholder="Card Title" />
+                          <textarea id="card-visual-desc-input" placeholder="Visual Description"></textarea>
+                          <button id="card-search-img-btn">Search Card Image</button>
+                          <div id="card-image-search-results"></div>
+                          <button id="card-generate-btn">Generate Card</button>
+                      </div>
+                      <div id="card-data-prepared" style="margin-top: 16px; display: none;">
+                          <h3>Card Data Prepared</h3>
+                          <div id="card-preview"></div>
+                          <button id="card-download-btn">Download Card (PDF/IMG - TBD)</button>
+                      </div>
                   </div>
                   <div id="img-gen-comic-mode" class="img-gen-mode-panel">
                       <label for="comic-characters">Characters:</label>
@@ -147,7 +141,9 @@
               </div>
           </div>
       </div>
-       <button class="close-popup-btn">Close</button>
+      <div id="img-gen-popup-footer" style="display: flex; justify-content: center; align-items: center; padding: 10px 0;">
+        <button id="story-generate-btn" style="display: none;">Generate Story</button>
+      </div>
   </div>
 
   <div id="ocr-popup" class="popup" style="display: none;">
