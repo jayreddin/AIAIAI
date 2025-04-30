@@ -896,7 +896,7 @@ async function handleBasicImageGeneration() {
     imgGenResults.innerHTML = '';
     try {
         if (typeof puter === 'undefined' || !puter.ai?.txt2img) throw new Error("txt2img missing.");
-        const imageElement = await puter.ai.txt2img(prompt, true);
+        const imageElement = await puter.ai.txt2img(prompt, false);
         if (imageElement?.tagName === 'IMG') {
             displayGeneratedImage(imageElement, prompt, imgGenResults);
         } else { throw new Error("Invalid image element returned."); }
@@ -1081,7 +1081,7 @@ async function handleStoryGeneration() {
             // Generate image for this chapter
             const imgPrompt = `Illustration for a story chapter titled \"${chapterTitle}\". Setting: ${setting || 'unspecified'}. Characters: ${characters || 'unspecified'}. Style: Storybook illustration.`;
             try {
-                const imageElement = await puter.ai.txt2img(imgPrompt, true);
+                const imageElement = await puter.ai.txt2img(imgPrompt, false);
                 if (imageElement?.tagName === 'IMG') {
                     imageElement.className = 'story-image';
                     imageElement.alt = `Image for ${chapterTitle}`;
@@ -1171,7 +1171,7 @@ async function handleCardImageGeneration() {
         if (!puter.ai?.txt2img) throw new Error("txt2img module missing.");
         console.log("Generating card image:", prompt);
         // testMode=true
-        const imageElement = await puter.ai.txt2img(prompt, true); //
+        const imageElement = await puter.ai.txt2img(prompt, false); //
         if (imageElement?.tagName === 'IMG') {
             displayCardImageThumbnail(imageElement.src, cardImageSearchResults, true); // Display and mark as selected
         } else {
@@ -1283,7 +1283,7 @@ async function handleComicGeneration() {
             console.log(`Generating image for Panel ${i + 1}...`);
             try {
                  // testMode=true
-                const imageElement = await puter.ai.txt2img(imgPrompt, true); //
+                const imageElement = await puter.ai.txt2img(imgPrompt, false); //
                 if (imageElement?.tagName === 'IMG') {
                     imageElement.className = 'comic-panel-image';
                     imageElement.alt = `Comic Panel ${i + 1}`;
