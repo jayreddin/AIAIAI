@@ -54,11 +54,13 @@ const imageModal = document.getElementById('image-modal');
 const expandedImage = document.getElementById('expanded-image');
 const imageModalSaveBtn = document.getElementById('image-modal-save');
 const imageModalCloseBtn = document.getElementById('image-modal-close');
-const imgGenPrompt = document.getElementById('img-gen-prompt');
-const imgGenGenerateBtn = document.getElementById('img-gen-generate-btn');
+let imgGenPrompt = document.getElementById('img-gen-prompt');
+let imgGenGenerateBtn = document.getElementById('img-gen-generate-btn');
 const imgGenResults = document.getElementById('img-gen-results');
 const imgGenLoading = document.getElementById('img-gen-loading');
 const imgGenError = document.getElementById('img-gen-error');
+let imgGenSizeSelect = null; // Initialize as null, will be created dynamically
+let imgGenAmountSelect = null; // Initialize as null, will be created dynamically
 const storyCharactersInput = document.getElementById('story-characters');
 const storySettingInput = document.getElementById('story-setting');
 const storyPlotInput = document.getElementById('story-plot');
@@ -493,43 +495,50 @@ function deleteMessage(bubble) {
 }
 
 async function speakMessage(text, buttonElement = null) {
-    let originalContent = null;
-    if (buttonElement) {
-        originalContent = buttonElement.innerHTML;
-        buttonElement.disabled = true;
-        buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    }
-    try {
-        if (typeof puter === 'undefined' || !puter.ai?.txt2speech) throw new Error("txt2speech missing.");
-        const audio = await puter.ai.txt2speech(text); //
-        if (audio?.play) { //
-            if (buttonElement) buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
-            audio.play(); //
-            audio.onended = () => {
-                if (buttonElement) {
-                    buttonElement.disabled = false;
-                    buttonElement.innerHTML = originalContent;
-                }
-            };
-            audio.onerror = (e) => {
-                console.error("Speech error:", e);
-                if (buttonElement) {
-                    buttonElement.disabled = false;
-                    buttonElement.innerHTML = originalContent;
-                }
-            };
-        } else {
-            console.error("No playable audio returned.");
-            if (buttonElement) {
-                buttonElement.disabled = false;
-                buttonElement.innerHTML = originalContent;
-            }
-        }
-    } catch (error) {
-        console.error("speakMessage error:", error);
+    if (!text) return;
+    
+    // If there's an ongoing speech, stop it
+    if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
         if (buttonElement) {
-            buttonElement.disabled = false;
-            buttonElement.innerHTML = originalContent;
+            buttonElement.classList.remove('speaking');
+            buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
+        }
+        return;
+    }
+    
+    try {
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Update button state when starting
+        if (buttonElement) {
+            buttonElement.classList.add('speaking');
+            buttonElement.innerHTML = '<i class="fas fa-stop"></i>';
+        }
+        
+        // Handle speech end
+        utterance.onend = () => {
+            if (buttonElement) {
+                buttonElement.classList.remove('speaking');
+                buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
+            }
+        };
+        
+        // Handle speech error
+        utterance.onerror = () => {
+            if (buttonElement) {
+                buttonElement.classList.remove('speaking');
+                buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
+            }
+            console.error('Speech synthesis error');
+        };
+        
+        window.speechSynthesis.speak(utterance);
+    } catch (error) {
+        console.error('Speech synthesis error:', error);
+        if (buttonElement) {
+            buttonElement.classList.remove('speaking');
+            buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
         }
     }
 }
@@ -907,55 +916,138 @@ function stopChatMicRecording() {
 // ... (initializeImageGenPopup remains the same)
 async function handleBasicImageGeneration() {
     if (!requireSignIn()) return;
-    if (!imgGenPrompt || !imgGenGenerateBtn || !imgGenResults || !imgGenLoading || !imgGenError) {
+    if (!imgGenPrompt || !imgGenGenerateBtn || !imgGenResults || !imgGenLoading || !imgGenError || !imgGenSizeSelect || !imgGenAmountSelect) {
         console.error("Img Gen Basic UI elements missing!"); return;
     }
+    
     const prompt = imgGenPrompt.value.trim();
-    if (!prompt) { imgGenError.textContent = "Enter prompt."; imgGenError.style.display = 'block'; return; }
+    if (!prompt) {
+        imgGenError.textContent = "Enter prompt.";
+        imgGenError.style.display = 'block';
+        return;
+    }
+    
+    const size = imgGenSizeSelect.value;
+    const amount = parseInt(imgGenAmountSelect.value, 10);
+    
+    // Set dimensions based on size selection
+    let width, height;
+    switch(size) {
+        case 'landscape':
+            width = 1024;
+            height = 512;
+            break;
+        case 'portrait':
+            width = 512;
+            height = 1024;
+            break;
+        case 'square':
+        default:
+            width = 512;
+            height = 512;
+            break;
+    }
+    
     imgGenGenerateBtn.disabled = true;
     imgGenError.style.display = 'none';
     imgGenLoading.style.display = 'block';
-    imgGenResults.innerHTML = '';
+    
+    // Create loading placeholders for each image
+    for (let i = 0; i < amount; i++) {
+        displayGeneratedImage(null, prompt, imgGenResults, true);
+    }
+    
     try {
-        if (typeof puter === 'undefined' || !puter.ai?.txt2img) throw new Error("Image generation module missing. Please check your internet connection or reload the page.");
-        let imageElement;
-        try {
-            imageElement = await puter.ai.txt2img(prompt, false);
-        } catch (err) {
-            // Try test mode if real API fails
-            console.warn('Real API failed, trying test mode:', err);
-            imageElement = await puter.ai.txt2img(prompt, true);
-        }
-        if (imageElement?.tagName === 'IMG') {
-            displayGeneratedImage(imageElement, prompt, imgGenResults);
-        } else { throw new Error("Invalid image element returned."); }
+        if (typeof puter === 'undefined' || !puter.ai?.txt2img)
+            throw new Error("Image generation module missing. Please check your internet connection or reload the page.");
+        
+        // Generate multiple images in parallel
+        const promises = Array(amount).fill().map(async () => {
+            try {
+                return await puter.ai.txt2img(prompt, false, { width, height });
+            } catch (err) {
+                console.warn('Real API failed, trying test mode:', err);
+                return await puter.ai.txt2img(prompt, true, { width, height });
+            }
+        });
+        
+        const results = await Promise.all(promises);
+        
+        // Replace placeholders with actual images
+        results.forEach((imageElement, index) => {
+            if (imageElement?.tagName === 'IMG') {
+                displayGeneratedImage(imageElement, prompt, imgGenResults, false);
+            }
+        });
+        
+        // Remove any remaining placeholders
+        const remainingPlaceholders = imgGenResults.querySelectorAll('.img-gen-thumbnail-container[data-placeholder="true"]');
+        remainingPlaceholders.forEach(placeholder => placeholder.remove());
+        
     } catch (error) {
         imgGenError.textContent = `Error: ${error.message || 'Unknown'}`;
         imgGenError.style.display = 'block';
+        // Remove all placeholders on error
+        const placeholders = imgGenResults.querySelectorAll('.img-gen-thumbnail-container[data-placeholder="true"]');
+        placeholders.forEach(placeholder => placeholder.remove());
     } finally {
         imgGenLoading.style.display = 'none';
         imgGenGenerateBtn.disabled = false;
     }
 }
 
-// Modified to accept target container
-function displayGeneratedImage(imageElement, prompt = "generated", targetContainer) {
+// Modified to accept target container and support loading state
+function displayGeneratedImage(imageElement, prompt = "generated", targetContainer, isLoading = false) {
     if (!targetContainer) { console.error("Target container missing for image display"); return; }
+    
     const container = document.createElement('div');
     container.className = 'img-gen-thumbnail-container';
-    imageElement.className = 'img-gen-thumbnail';
-    imageElement.alt = prompt;
-    imageElement.onclick = () => expandImage(imageElement.src); // Keep expand functionality
-    const saveButton = document.createElement('button');
-    saveButton.className = 'img-gen-save-btn';
-    saveButton.title = 'Save Image';
-    saveButton.innerHTML = '<i class="fas fa-save"></i>';
-    saveButton.onclick = (e) => {
-        e.stopPropagation(); saveImageFromDataUrl(imageElement.src, prompt);
-    };
-    container.append(imageElement, saveButton);
-    // Prepend to the container to show newest first
-    targetContainer.prepend(container);
+    
+    if (isLoading) {
+        // Create loading placeholder
+        const placeholder = document.createElement('div');
+        placeholder.className = 'img-gen-loading-placeholder';
+        placeholder.style.width = '256px';
+        placeholder.style.height = '256px';
+        placeholder.style.backgroundColor = '#f0f0f0';
+        placeholder.style.display = 'flex';
+        placeholder.style.alignItems = 'center';
+        placeholder.style.justifyContent = 'center';
+        placeholder.style.borderRadius = '8px';
+        
+        const spinner = document.createElement('i');
+        spinner.className = 'fas fa-spinner fa-spin fa-2x';
+        spinner.style.color = '#666';
+        
+        placeholder.appendChild(spinner);
+        container.appendChild(placeholder);
+        container.dataset.placeholder = 'true';
+    } else {
+        // Real image
+        imageElement.className = 'img-gen-thumbnail';
+        imageElement.alt = prompt;
+        imageElement.onclick = () => expandImage(imageElement.src);
+        
+        const saveButton = document.createElement('button');
+        saveButton.className = 'img-gen-save-btn';
+        saveButton.title = 'Save Image';
+        saveButton.innerHTML = '<i class="fas fa-save"></i>';
+        saveButton.onclick = (e) => {
+            e.stopPropagation();
+            saveImageFromDataUrl(imageElement.src, prompt);
+        };
+        
+        container.append(imageElement, saveButton);
+    }
+    
+    // If there's a placeholder, replace it, otherwise prepend
+    const existingPlaceholder = targetContainer.querySelector('.img-gen-thumbnail-container[data-placeholder="true"]');
+    if (existingPlaceholder) {
+        targetContainer.replaceChild(container, existingPlaceholder);
+    } else {
+        targetContainer.prepend(container);
+    }
+    return container;
 }
 
 // Helper for saving image data URLs
@@ -1356,86 +1448,87 @@ function handleComicDownload() {
 
 function initializeImageGenPopup() {
     if (imgGenListenersAdded) return;
-    // Update the elements list to match the current HTML structure
-    const elements = [
-        imgGenGenerateBtn, 
-        imgGenPrompt, 
-        imgGenModeButtonsContainer, 
-        imgGenModePanelsContainer, 
-        imageModalSaveBtn, 
-        imageModalCloseBtn, 
-        imageModalBackdrop, 
-        storyGenerateBtn, 
-        storyDownloadBtn,
-        cardVisualDescInput,
-        cardSearchImgBtn,
-        cardGenerateBtn,
-        cardDownloadBtn,
-        cardImageSearchResults,
-        comicGenerateBtn,
-        comicDownloadBtn
-    ];
     
-    if (elements.some(el => !el)) {
-        console.warn("Some Img Gen elements missing.");
-        // Log which elements are missing for debugging
-        elements.forEach((el, index) => {
-            if (!el) {
-                console.warn(`Missing element at index ${index}:`, elements[index]);
-            }
-        });
-        return;
+    // Create basic mode container if it doesn't exist
+    const basicContainer = document.createElement('div');
+    basicContainer.className = 'img-gen-basic-container';
+    
+    // Create prompt textarea if it doesn't exist
+    if (!imgGenPrompt) {
+        imgGenPrompt = document.createElement('textarea');
+        imgGenPrompt.id = 'img-gen-prompt';
+        imgGenPrompt.className = 'img-gen-prompt';
+        imgGenPrompt.placeholder = 'Describe the image you want to generate...';
+    }
+    // Always add the prompt textarea to the container
+    basicContainer.appendChild(imgGenPrompt);
+    
+    // Create controls row
+    const controlsRow = document.createElement('div');
+    controlsRow.className = 'img-gen-controls-row';
+    
+    // Create size select if it doesn't exist
+    if (!imgGenSizeSelect) {
+        imgGenSizeSelect = document.createElement('select');
+        imgGenSizeSelect.id = 'img-gen-size-select';
+        imgGenSizeSelect.className = 'img-gen-control-select';
+        imgGenSizeSelect.innerHTML = `
+            <option value="square">Square 1:1</option>
+            <option value="landscape">Landscape 16:9</option>
+            <option value="portrait">Portrait 9:16</option>
+        `;
     }
     
-    console.log("Initializing Img Gen listeners.");
-
-    // Basic Mode
+    // Create generate button if it doesn't exist
+    if (!imgGenGenerateBtn) {
+        imgGenGenerateBtn = document.createElement('button');
+        imgGenGenerateBtn.id = 'img-gen-generate-btn';
+        imgGenGenerateBtn.textContent = 'Generate';
+    }
+    
+    // Create amount select if it doesn't exist
+    if (!imgGenAmountSelect) {
+        imgGenAmountSelect = document.createElement('select');
+        imgGenAmountSelect.id = 'img-gen-amount-select';
+        imgGenAmountSelect.className = 'img-gen-control-select';
+        imgGenAmountSelect.innerHTML = `
+            <option value="1">1 Image</option>
+            <option value="2">2 Images</option>
+            <option value="3">3 Images</option>
+            <option value="4">4 Images</option>
+        `;
+    }
+    
+    // Add elements to controls row
+    controlsRow.appendChild(imgGenSizeSelect);
+    controlsRow.appendChild(imgGenGenerateBtn);
+    controlsRow.appendChild(imgGenAmountSelect);
+    basicContainer.appendChild(controlsRow);
+    
+    // Create results area if it doesn't exist
+    if (!imgGenResults) {
+        imgGenResults = document.createElement('div');
+        imgGenResults.id = 'img-gen-results';
+    }
+    basicContainer.appendChild(imgGenResults);
+    
+    // Add the container to the popup
+    const basicModePanel = document.querySelector('#img-gen-basic-mode');
+    if (basicModePanel) {
+        basicModePanel.innerHTML = '';
+        basicModePanel.appendChild(basicContainer);
+    }
+    
+    // Initialize event listeners
     imgGenGenerateBtn.addEventListener('click', handleBasicImageGeneration);
-    imgGenPrompt.addEventListener('keypress', (e) => { 
-        if (e.key === 'Enter' && !e.shiftKey) { 
-            e.preventDefault(); 
-            handleBasicImageGeneration(); 
-        } 
+    imgGenPrompt.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleBasicImageGeneration();
+        }
     });
-
-    // Story Mode
-    storyGenerateBtn.addEventListener('click', handleStoryGeneration);
-    storyDownloadBtn.addEventListener('click', handleStoryDownload);
-
-    // Card Mode
-    cardSearchImgBtn.addEventListener('click', handleCardImageSearch);
-    cardGenerateBtn.addEventListener('click', handleCardGeneration);
-    cardDownloadBtn.addEventListener('click', handleCardDownload);
-
-    // Comic Mode
-    comicGenerateBtn.addEventListener('click', handleComicGeneration);
-    comicDownloadBtn.addEventListener('click', handleComicDownload);
-
-    // Mode Switching
-    const modeButtons = imgGenModeButtonsContainer.querySelectorAll('.img-gen-mode-btn');
-    const modePanels = imgGenModePanelsContainer.querySelectorAll('.img-gen-mode-panel');
-    modeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const mode = button.getAttribute('data-mode');
-            if (button.disabled) return;
-            modeButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            modePanels.forEach(panel => panel.classList.toggle('active', panel.id === `img-gen-${mode}-mode`));
-            document.getElementById('img-gen-basic-results-area').style.display = (mode === 'basic') ? 'block' : 'none';
-            currentImageGenMode = mode;
-            console.log("Img Gen mode switched to:", mode);
-            // Update footer button visibility
-            updateImgGenFooterButton();
-        });
-    });
-
-    // Image Modal
-    imageModalCloseBtn.addEventListener('click', closeImageModal);
-    imageModalBackdrop.addEventListener('click', closeImageModal);
-    imageModalSaveBtn.addEventListener('click', saveExpandedImage);
-
+    
     imgGenListenersAdded = true;
-    console.log("Img Gen listeners added.");
 }
 
 
@@ -1824,6 +1917,110 @@ function initializeSettingsPopup() {
     if (elements.some(el => !el)) { console.error("Settings UI elements missing!"); return; }
 
     console.log("Initializing Settings listeners and content.");
+
+    // Create Chat Controls section in UI Panel
+    const chatControlsSection = document.createElement('div');
+    chatControlsSection.className = 'settings-section';
+    chatControlsSection.innerHTML = `
+        <h3>Chat Controls</h3>
+        <div class="settings-controls-group">
+            <button id="settings-search-btn" class="settings-control-btn">
+                <i class="fas fa-search"></i> Search Messages
+            </button>
+            <button id="settings-export-btn" class="settings-control-btn">
+                <i class="fas fa-file-export"></i> Export Conversation
+            </button>
+            <button id="settings-background-btn" class="settings-control-btn">
+                <i class="fas fa-image"></i> Change Background
+            </button>
+        </div>
+    `;
+    
+    // Add styles for the new section
+    const style = document.createElement('style');
+    style.textContent = `
+        .settings-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .settings-section h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+        .settings-controls-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .settings-control-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            width: 100%;
+            justify-content: flex-start;
+        }
+        .settings-control-btn:hover {
+            background: #f0f0f0;
+            border-color: #ccc;
+        }
+        .settings-control-btn i {
+            font-size: 14px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* Hide the original icon buttons */
+        #search-messages-btn,
+        #export-conversation-btn,
+        #change-background-btn {
+            display: none !important;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Insert the chat controls section into the UI panel
+    settingsUIPanel.insertBefore(chatControlsSection, settingsUISaveBtn);
+    
+    // Add event listeners for the new buttons
+    const searchBtn = document.getElementById('settings-search-btn');
+    const exportBtn = document.getElementById('settings-export-btn');
+    const backgroundBtn = document.getElementById('settings-background-btn');
+    
+    if (searchBtn) searchBtn.addEventListener('click', () => {
+        // Implement search functionality
+        showSearchPopup();
+    });
+    
+    if (exportBtn) exportBtn.addEventListener('click', () => {
+        // Export conversation
+        const messages = Array.from(messageDisplay.querySelectorAll('.message-bubble')).map(bubble => ({
+            sender: bubble.classList.contains('user-bubble') ? 'User' : 'AI',
+            text: bubble.querySelector('.message-content')?.textContent || ''
+        }));
+        
+        const exportText = messages.map(m => `${m.sender}: ${m.text}`).join('\n\n');
+        const blob = new Blob([exportText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `chat_export_${new Date().toISOString().slice(0,10)}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+    
+    if (backgroundBtn) backgroundBtn.addEventListener('click', () => {
+        showBackgroundPopup();
+    });
 
     // Sync theme select dropdown to current theme
     if (settingsThemeSelect && currentUISettings.theme) {
@@ -2796,4 +2993,100 @@ function clearVisionResults() {
 function saveVisionImage() {
     if (!lastCapturedFrameDataUrl) { alert("No image captured to save."); return; }
     saveImageFromDataUrl(lastCapturedFrameDataUrl, `vision_capture_${Date.now()}`);
+}
+
+// Add helper functions for the popups
+function showSearchPopup() {
+    const searchPopup = document.createElement('div');
+    searchPopup.className = 'popup';
+    searchPopup.id = 'search-popup';
+    searchPopup.innerHTML = `
+        <div class="popup-header">
+            <h2>Search Messages</h2>
+            <button class="close-popup-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="popup-content-area">
+            <div class="search-container">
+                <div class="search-input-group">
+                    <input type="text" class="search-input" placeholder="Search messages...">
+                    <button class="search-button"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="search-options-group">
+                    <label class="search-option">
+                        <input type="checkbox" checked> Case sensitive
+                    </label>
+                    <label class="search-option">
+                        <input type="checkbox" checked> Match whole words
+                    </label>
+                </div>
+                <div class="search-results-container">
+                    <div class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(searchPopup);
+    
+    // Initialize search functionality
+    const searchInput = searchPopup.querySelector('.search-input');
+    const searchButton = searchPopup.querySelector('.search-button');
+    const searchResults = searchPopup.querySelector('.search-results');
+    
+    // Add search logic here
+    // ... implementation of search functionality ...
+    
+    // Close button functionality
+    const closeBtn = searchPopup.querySelector('.close-popup-btn');
+    closeBtn.addEventListener('click', () => {
+        document.body.removeChild(searchPopup);
+    });
+}
+
+function showBackgroundPopup() {
+    const backgroundPopup = document.createElement('div');
+    backgroundPopup.className = 'popup';
+    backgroundPopup.id = 'background-popup';
+    backgroundPopup.innerHTML = `
+        <div class="popup-header">
+            <h2>Change Background</h2>
+            <button class="close-popup-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="popup-content-area">
+            <div class="background-settings-container">
+                <div class="background-type-group">
+                    <label>
+                        <input type="radio" name="bg-type" value="color" checked> Solid Color
+                    </label>
+                    <label>
+                        <input type="radio" name="bg-type" value="gradient"> Gradient
+                    </label>
+                    <label>
+                        <input type="radio" name="bg-type" value="image"> Image
+                    </label>
+                </div>
+                <div class="background-custom-input">
+                    <input type="color" id="bg-color-picker" value="#f0f2f5">
+                </div>
+                <div class="background-preview">
+                    Preview
+                </div>
+                <button class="background-apply-button">Apply Background</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(backgroundPopup);
+    
+    // Initialize background settings functionality
+    const colorPicker = backgroundPopup.querySelector('#bg-color-picker');
+    const applyButton = backgroundPopup.querySelector('.background-apply-button');
+    const preview = backgroundPopup.querySelector('.background-preview');
+    
+    // Add background change logic here
+    // ... implementation of background change functionality ...
+    
+    // Close button functionality
+    const closeBtn = backgroundPopup.querySelector('.close-popup-btn');
+    closeBtn.addEventListener('click', () => {
+        document.body.removeChild(backgroundPopup);
+    });
 }
