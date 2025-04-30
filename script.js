@@ -195,6 +195,7 @@ function getAllModels() {
 async function updateUiForAuthState(isSignedIn) {
     if (!authSectionDiv || !chatUiDiv) { console.error("Core UI missing."); return; }
     if (isSignedIn) {
+        document.body.classList.add('signed-in');
         try {
             if (authStatusDiv) authStatusDiv.textContent = 'Fetching user info...';
             if (typeof puter === 'undefined' || !puter.auth) throw new Error("Puter SDK/auth missing.");
@@ -218,6 +219,7 @@ async function updateUiForAuthState(isSignedIn) {
             if (signOutButton) signOutButton.style.display = 'none';
         }
     } else {
+        document.body.classList.remove('signed-in');
         if (authStatusDiv) authStatusDiv.textContent = 'Not signed in.';
         authSectionDiv.style.display = 'block';
         if (signInButton) { signInButton.disabled = false; signInButton.textContent = 'Sign In'; }
@@ -331,6 +333,18 @@ function populateModelSelector(modelsToList = getAllModels()) {
 
 // --- Phase 3 & 5: Chat Logic & Display ---
 // ... (displayMessage, createActionButton, sendMessage remain largely the same) ...
+function getModelIconClass(modelId) {
+    if (!modelId) return 'fas fa-robot';
+    if (modelId.includes('gpt') || modelId.includes('openai')) return 'fab fa-openai';
+    if (modelId.includes('claude')) return 'fab fa-aws';
+    if (modelId.includes('gemini') || modelId.includes('google')) return 'fab fa-google';
+    if (modelId.includes('llama') || modelId.includes('meta')) return 'fas fa-hippo';
+    if (modelId.includes('mistral') || modelId.includes('pixtral')) return 'fas fa-wind';
+    if (modelId.includes('grok') || modelId.includes('x-ai')) return 'fas fa-brain';
+    if (modelId.includes('deepseek')) return 'fas fa-search';
+    return 'fas fa-robot';
+}
+
 function displayMessage(text, sender) {
     if (!messageDisplay) { console.error("Msg display missing!"); return; }
     const bubble = document.createElement('div');
@@ -352,17 +366,21 @@ function displayMessage(text, sender) {
             header.appendChild(nameSpan); // username right
             bubble.classList.add('user-bubble');
         } else {
-            nameSpan.textContent = selectedModel;
+            // Add model icon
+            const icon = document.createElement('i');
+            icon.className = getModelIconClass(selectedModel) + ' model-bubble-icon';
+            nameSpan.appendChild(icon);
+            nameSpan.appendChild(document.createTextNode(' ' + selectedModel));
             header.appendChild(nameSpan); // model left
             header.appendChild(timeSpan); // timestamp right
             bubble.classList.add('ai-bubble');
         }
         bubble.appendChild(header);
         // Message text
-    const content = document.createElement('div');
-    content.className = 'message-content';
-    content.textContent = text;
-    bubble.appendChild(content);
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        content.textContent = text;
+        bubble.appendChild(content);
         // Actions
         const actions = document.createElement('div');
         actions.className = 'message-actions';
@@ -1579,6 +1597,66 @@ function initializeVisionPopup() {
 
     visionListenersAdded = true;
     console.log("Vision listeners added.");
+
+    const visionResetPreviewBtn = document.getElementById('vision-reset-preview-btn');
+
+    // ... inside initializeVisionPopup ...
+    if (visionResetPreviewBtn) {
+        visionResetPreviewBtn.addEventListener('click', () => {
+            // Default size
+            const defaultWidth = 320;
+            const defaultHeight = 240;
+            visionVideoContainer.style.width = defaultWidth + 'px';
+            visionVideoContainer.style.height = defaultHeight + 'px';
+            // Center in viewport
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            visionVideoContainer.style.left = ((vw - defaultWidth) / 2) + 'px';
+            visionVideoContainer.style.top = ((vh - defaultHeight) / 2) + 'px';
+        });
+    }
+
+    // Desktop resize handle logic
+    let isResizing = false;
+    let resizeStartX = 0, resizeStartY = 0, startWidth = 0, startHeight = 0;
+
+    // Add a resize handle (bottom-right corner)
+    let resizeHandle = visionVideoContainer.querySelector('.vision-resize-handle');
+    if (!resizeHandle) {
+        resizeHandle = document.createElement('div');
+        resizeHandle.className = 'vision-resize-handle';
+        resizeHandle.style.position = 'absolute';
+        resizeHandle.style.right = '0';
+        resizeHandle.style.bottom = '0';
+        resizeHandle.style.width = '24px';
+        resizeHandle.style.height = '24px';
+        resizeHandle.style.background = 'rgba(0,0,0,0.15)';
+        resizeHandle.style.cursor = 'nwse-resize';
+        resizeHandle.style.zIndex = '30';
+        visionVideoContainer.appendChild(resizeHandle);
+    }
+    resizeHandle.addEventListener('mousedown', function(e) {
+        isResizing = true;
+        resizeStartX = e.clientX;
+        resizeStartY = e.clientY;
+        startWidth = visionVideoContainer.offsetWidth;
+        startHeight = visionVideoContainer.offsetHeight;
+        document.body.style.userSelect = 'none';
+        e.stopPropagation();
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing) return;
+        let newWidth = Math.max(60, startWidth + (e.clientX - resizeStartX));
+        let newHeight = Math.max(40, startHeight + (e.clientY - resizeStartY));
+        visionVideoContainer.style.width = newWidth + 'px';
+        visionVideoContainer.style.height = newHeight + 'px';
+    });
+    document.addEventListener('mouseup', function() {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.userSelect = '';
+        }
+    });
 }
 
 let visionFacingMode = 'user'; // Default to front camera
@@ -1792,12 +1870,26 @@ function populateSettingsModelsList() {
         label.htmlFor = checkbox.id;
         // Clean display name
         let displayName = modelId;
-         if (displayName.includes('/')) displayName = displayName.split('/')[1];
-         displayName = displayName.replace(/:free|:thinking|-exp-[\d-]+/g, '');
+        if (displayName.includes('/')) displayName = displayName.split('/')[1];
+        displayName = displayName.replace(/:free|:thinking|-exp-[\d-]+/g, '');
         label.textContent = displayName;
+
+        // Details button
+        const detailsBtn = document.createElement('button');
+        detailsBtn.className = 'settings-model-details-btn';
+        detailsBtn.textContent = 'Details';
+        // Description (hidden by default)
+        const descDiv = document.createElement('div');
+        descDiv.className = 'settings-model-description';
+        descDiv.textContent = `Description for ${displayName}. (Add real model descriptions here.)`;
+        detailsBtn.addEventListener('click', () => {
+            itemDiv.classList.toggle('details-open');
+        });
 
         itemDiv.appendChild(checkbox);
         itemDiv.appendChild(label);
+        itemDiv.appendChild(detailsBtn);
+        itemDiv.appendChild(descDiv);
         settingsModelsList.appendChild(itemDiv);
     });
     console.log("Populated settings model list based on allowed models:", allowedModels);
@@ -2471,3 +2563,12 @@ if (cardDownloadBtn) {
         document.body.style.userSelect = '';
     });
 // ... existing code ...
+
+if (settingsTextSizeSlider) {
+    settingsTextSizeSlider.addEventListener('input', () => {
+        const newSize = settingsTextSizeSlider.value;
+        if (settingsTextSizeValue) settingsTextSizeValue.textContent = `${newSize}%`;
+        document.body.style.setProperty('--base-font-size-multiplier', newSize / 100);
+        // Optionally, update other UI elements if needed
+    });
+}
