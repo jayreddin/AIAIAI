@@ -377,10 +377,10 @@ function displayMessage(text, sender) {
         }
         bubble.appendChild(header);
         // Message text
-        const content = document.createElement('div');
-        content.className = 'message-content';
-        content.textContent = text;
-        bubble.appendChild(content);
+    const content = document.createElement('div');
+    content.className = 'message-content';
+    content.textContent = text;
+    bubble.appendChild(content);
         // Actions
         const actions = document.createElement('div');
         actions.className = 'message-actions';
@@ -1554,18 +1554,50 @@ function initializeVisionPopup() {
     setCameraUIState(false);
 
     visionEnableCamBtn.addEventListener('click', () => {
-        startVisionCamera();
+        startVisionCameraPatched();
     });
+    
     visionStopCamBtn.addEventListener('click', () => {
-        stopVisionCamera();
+        stopVisionCameraPatched();
     });
-    visionFlipCamBtn.addEventListener('click', () => {
-        visionFacingMode = (visionFacingMode === 'user') ? 'environment' : 'user';
-        if (visionStream) {
-            stopVisionCamera();
-        }
-        startVisionCamera();
-    });
+    
+    // Replace the old flip button listener with the improved version
+    if (visionFlipCamBtn) {
+        visionFlipCamBtn.addEventListener('click', async () => {
+            visionStatus.textContent = 'Switching camera...';
+            visionStatus.style.display = 'block';
+            visionStatus.style.color = '#6c757d';
+            
+            // Toggle between front and back camera
+            visionFacingMode = (visionFacingMode === 'user') ? 'environment' : 'user';
+            
+            // Inform the user what's happening
+            visionFlipCamBtn.disabled = true;
+            visionDescribeBtn.disabled = true;
+            
+            try {
+                // Stop existing stream
+                if (visionStream) {
+                    visionStream.getTracks().forEach(track => track.stop());
+                    visionStream = null;
+                }
+                
+                // Small timeout to ensure camera is fully released
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Start new stream with new facing mode
+                await startVisionCamera();
+            } catch (error) {
+                console.error("Error flipping camera:", error);
+                visionStatus.textContent = `Error switching camera: ${error.message || 'Unknown'}`;
+                visionStatus.style.color = 'red';
+            } finally {
+                visionFlipCamBtn.disabled = false;
+                visionDescribeBtn.disabled = false;
+            }
+        });
+    }
+    
     visionDescribeBtn.addEventListener('click', describeVisionFrame);
     visionClearBtn.addEventListener('click', clearVisionResults);
     visionSpeakBtn.addEventListener('click', () => {
@@ -1578,7 +1610,6 @@ function initializeVisionPopup() {
     });
     visionSaveImgBtn.addEventListener('click', saveVisionImage);
 
-    // --- Draggable Vision Video Container ---
     // ... (existing drag/touch logic remains unchanged) ...
 
     // Patch start/stop camera to update UI state
@@ -1590,17 +1621,9 @@ function initializeVisionPopup() {
         setCameraUIState(false);
         stopVisionCamera();
     }
-    visionEnableCamBtn.removeEventListener('click', startVisionCamera); // Remove old
-    visionEnableCamBtn.addEventListener('click', startVisionCameraPatched);
-    visionStopCamBtn.removeEventListener('click', stopVisionCamera); // Remove old
-    visionStopCamBtn.addEventListener('click', stopVisionCameraPatched);
-
-    visionListenersAdded = true;
-    console.log("Vision listeners added.");
-
+    
     const visionResetPreviewBtn = document.getElementById('vision-reset-preview-btn');
 
-    // ... inside initializeVisionPopup ...
     if (visionResetPreviewBtn) {
         visionResetPreviewBtn.addEventListener('click', () => {
             // Default size
@@ -1616,192 +1639,8 @@ function initializeVisionPopup() {
         });
     }
 
-    // Desktop resize handle logic
-    let isResizing = false;
-    let resizeStartX = 0, resizeStartY = 0, startWidth = 0, startHeight = 0;
-
-    // Add a resize handle (bottom-right corner)
-    let resizeHandle = visionVideoContainer.querySelector('.vision-resize-handle');
-    if (!resizeHandle) {
-        resizeHandle = document.createElement('div');
-        resizeHandle.className = 'vision-resize-handle';
-        resizeHandle.style.position = 'absolute';
-        resizeHandle.style.right = '0';
-        resizeHandle.style.bottom = '0';
-        resizeHandle.style.width = '24px';
-        resizeHandle.style.height = '24px';
-        resizeHandle.style.background = 'rgba(0,0,0,0.15)';
-        resizeHandle.style.cursor = 'nwse-resize';
-        resizeHandle.style.zIndex = '30';
-        visionVideoContainer.appendChild(resizeHandle);
-    }
-    resizeHandle.addEventListener('mousedown', function(e) {
-        isResizing = true;
-        resizeStartX = e.clientX;
-        resizeStartY = e.clientY;
-        startWidth = visionVideoContainer.offsetWidth;
-        startHeight = visionVideoContainer.offsetHeight;
-        document.body.style.userSelect = 'none';
-        e.stopPropagation();
-    });
-    document.addEventListener('mousemove', function(e) {
-        if (!isResizing) return;
-        let newWidth = Math.max(60, startWidth + (e.clientX - resizeStartX));
-        let newHeight = Math.max(40, startHeight + (e.clientY - resizeStartY));
-        visionVideoContainer.style.width = newWidth + 'px';
-        visionVideoContainer.style.height = newHeight + 'px';
-    });
-    document.addEventListener('mouseup', function() {
-        if (isResizing) {
-            isResizing = false;
-            document.body.style.userSelect = '';
-        }
-    });
-}
-
-let visionFacingMode = 'user'; // Default to front camera
-
-const visionFlipCamBtn = document.getElementById('vision-flip-cam-btn');
-if (visionFlipCamBtn) {
-    visionFlipCamBtn.addEventListener('click', () => {
-        visionFacingMode = (visionFacingMode === 'user') ? 'environment' : 'user';
-        if (visionStream) {
-            stopVisionCamera();
-        }
-        startVisionCamera();
-    });
-}
-
-async function startVisionCamera() {
-    if (!navigator.mediaDevices?.getUserMedia) { alert('Camera API not supported.'); return; }
-    if (!visionVideoPreview || !visionEnableCamBtn || !visionVideoContainer || !visionControls || !visionStatus) return;
-    visionStatus.textContent = 'Requesting camera access...';
-    visionStatus.style.display = 'block'; visionStatus.style.color = '#6c757d';
-    visionEnableCamBtn.disabled = true;
-    try {
-        visionStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: visionFacingMode } });
-        console.log("Camera stream obtained.");
-        visionVideoPreview.srcObject = visionStream;
-        visionVideoPreview.onloadedmetadata = () => {
-            visionVideoPreview.play().catch(e => console.error("Video play failed:", e)); // Handle play promise rejection
-            visionEnableCamBtn.style.display = 'none';
-            visionVideoContainer.style.display = 'block';
-            visionControls.style.display = 'block';
-            visionStatus.style.display = 'none';
-            clearVisionResults(); // Clear previous results when starting camera
-            console.log("Camera preview started.");
-        };
-        visionVideoPreview.onerror = (e) => {
-            console.error("Video preview error:", e);
-            visionStatus.textContent = `Video error: ${e.message || 'Unknown'}`;
-            visionStatus.style.color = 'red';
-            stopVisionCamera(); // Stop if video errors out
-        };
-        // Make video preview resize with container
-        visionVideoPreview.style.width = '100%';
-        visionVideoPreview.style.height = '100%';
-    } catch (err) {
-        console.error("Error accessing camera:", err);
-        visionStatus.textContent = `Error accessing camera: ${err.name}. Check permissions.`;
-        visionStatus.style.color = 'red';
-        visionEnableCamBtn.disabled = false;
-    }
-}
-
-function stopVisionCamera() {
-    if (visionStream) {
-        visionStream.getTracks().forEach(track => track.stop());
-        console.log("Camera stream stopped.");
-    }
-    visionStream = null;
-    lastCapturedFrameDataUrl = null;
-    if (visionVideoPreview) visionVideoPreview.srcObject = null;
-    if (visionEnableCamBtn) visionEnableCamBtn.style.display = 'block';
-    if (visionVideoContainer) visionVideoContainer.style.display = 'none';
-    if (visionControls) visionControls.style.display = 'none';
-    if (visionActions) visionActions.style.display = 'none';
-    if (visionStatus) visionStatus.style.display = 'none';
-    if (visionResultsText) visionResultsText.value = '';
-    if (visionEnableCamBtn) visionEnableCamBtn.disabled = false;
-}
-
-async function describeVisionFrame() {
-    if (!visionVideoPreview || !visionStream || !visionDescribeBtn || !visionResultsText || !visionStatus || !visionActions) {
-        console.error("Vision elements missing for description."); return;
-    }
-    if (visionVideoPreview.readyState < visionVideoPreview.HAVE_CURRENT_DATA) { // Check if frame data is available
-        console.warn("Video not ready for capture."); visionStatus.textContent = 'Video not ready...';
-        visionStatus.style.display = 'block'; return;
-    }
-    visionDescribeBtn.disabled = true;
-    visionStatus.textContent = 'Capturing frame...'; visionStatus.style.color = '#6c757d';
-    visionStatus.style.display = 'block';
-    visionResultsText.value = ''; visionActions.style.display = 'none'; // Hide actions during processing
-
-    try {
-        // Create canvas if it doesn't exist
-        if (!visionCanvas) visionCanvas = document.createElement('canvas');
-        const videoWidth = visionVideoPreview.videoWidth;
-        const videoHeight = visionVideoPreview.videoHeight;
-        if (videoWidth === 0 || videoHeight === 0) { throw new Error("Video dimensions are zero."); }
-        visionCanvas.width = videoWidth;
-        visionCanvas.height = videoHeight;
-        const context = visionCanvas.getContext('2d');
-        context.drawImage(visionVideoPreview, 0, 0, videoWidth, videoHeight);
-        // Get frame as JPEG data URL
-        lastCapturedFrameDataUrl = visionCanvas.toDataURL('image/jpeg', 0.9);
-        console.log("Frame captured (JPEG data URL length):", lastCapturedFrameDataUrl.length);
-
-        visionStatus.textContent = 'Asking AI to describe...';
-        if (typeof puter === 'undefined' || !puter.ai?.chat) throw new Error("Puter chat missing.");
-
-        // Use a vision-capable model
-        const visionModelToUse = 'gpt-4o-mini'; // Or 'gpt-4o', 'pixtral-large-latest' etc.
-        console.log(`Sending frame to Vision model: ${visionModelToUse}`);
-
-        // Call puter.ai.chat with prompt and image data URL [cite: 772, 779, 792]
-        const response = await puter.ai.chat("Describe this image in detail.", lastCapturedFrameDataUrl, { model: visionModelToUse });
-
-        console.log("Vision response received:", response);
-        let aiText = "Sorry, couldn't get description.";
-        if (response && typeof response === 'string') aiText = response;
-        else if (response?.text) aiText = response.text;
-        else if (response?.message?.content) aiText = response.message.content;
-        else if (response?.error) aiText = `Error: ${response.error.message || response.error}`;
-        else console.warn("Unexpected vision response:", response);
-
-        visionResultsText.value = aiText;
-        visionStatus.style.display = 'none';
-        visionActions.style.display = 'block'; // Show action buttons
-        visionSpeakBtn.disabled = !aiText;
-        visionCopyBtn.disabled = !aiText;
-        visionSaveImgBtn.disabled = false; // Enable save image now that frame is captured
-
-    } catch (error) {
-        console.error("Error describing vision frame:", error);
-        visionStatus.textContent = `Error: ${error.message || 'Unknown error'}`;
-        visionStatus.style.color = 'red';
-        lastCapturedFrameDataUrl = null; // Clear invalid frame data
-        visionSaveImgBtn.disabled = true; // Disable save if error occurred
-    } finally {
-        visionDescribeBtn.disabled = false; // Re-enable describe button
-    }
-}
-
-function clearVisionResults() {
-    if (visionResultsText) visionResultsText.value = '';
-    if (visionActions) visionActions.style.display = 'none';
-    if (visionStatus) visionStatus.style.display = 'none';
-    if (visionSpeakBtn) visionSpeakBtn.disabled = true;
-    if (visionCopyBtn) visionCopyBtn.disabled = true;
-    // Keep save image button enabled if a frame was captured
-    // if (visionSaveImgBtn) visionSaveImgBtn.disabled = true;
-    // Don't clear lastCapturedFrameDataUrl here
-}
-
-function saveVisionImage() {
-    if (!lastCapturedFrameDataUrl) { alert("No image captured to save."); return; }
-    saveImageFromDataUrl(lastCapturedFrameDataUrl, `vision_capture_${Date.now()}`);
+    visionListenersAdded = true;
+    console.log("Vision listeners added.");
 }
 
 // --- Phase 14: Settings ---
@@ -1870,8 +1709,8 @@ function populateSettingsModelsList() {
         label.htmlFor = checkbox.id;
         // Clean display name
         let displayName = modelId;
-        if (displayName.includes('/')) displayName = displayName.split('/')[1];
-        displayName = displayName.replace(/:free|:thinking|-exp-[\d-]+/g, '');
+         if (displayName.includes('/')) displayName = displayName.split('/')[1];
+         displayName = displayName.replace(/:free|:thinking|-exp-[\d-]+/g, '');
         label.textContent = displayName;
 
         // Details button
@@ -2571,4 +2410,216 @@ if (settingsTextSizeSlider) {
         document.body.style.setProperty('--base-font-size-multiplier', newSize / 100);
         // Optionally, update other UI elements if needed
     });
+}
+
+// Desktop resize handle logic
+function addResizeHandleToVisionContainer() {
+    let isResizing = false;
+    let resizeStartX = 0, resizeStartY = 0, startWidth = 0, startHeight = 0;
+
+    // Add a resize handle (bottom-right corner)
+    let resizeHandle = visionVideoContainer.querySelector('.vision-resize-handle');
+    if (!resizeHandle) {
+        resizeHandle = document.createElement('div');
+        resizeHandle.className = 'vision-resize-handle';
+        resizeHandle.style.position = 'absolute';
+        resizeHandle.style.right = '0';
+        resizeHandle.style.bottom = '0';
+        resizeHandle.style.width = '24px';
+        resizeHandle.style.height = '24px';
+        resizeHandle.style.background = 'rgba(0,0,0,0.15)';
+        resizeHandle.style.cursor = 'nwse-resize';
+        resizeHandle.style.zIndex = '30';
+        visionVideoContainer.appendChild(resizeHandle);
+    }
+    
+    resizeHandle.addEventListener('mousedown', function(e) {
+        isResizing = true;
+        resizeStartX = e.clientX;
+        resizeStartY = e.clientY;
+        startWidth = visionVideoContainer.offsetWidth;
+        startHeight = visionVideoContainer.offsetHeight;
+        document.body.style.userSelect = 'none';
+        e.stopPropagation();
+    });
+    
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing) return;
+        let newWidth = Math.max(60, startWidth + (e.clientX - resizeStartX));
+        let newHeight = Math.max(40, startHeight + (e.clientY - resizeStartY));
+        visionVideoContainer.style.width = newWidth + 'px';
+        visionVideoContainer.style.height = newHeight + 'px';
+    });
+    
+    document.addEventListener('mouseup', function() {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.userSelect = '';
+        }
+    });
+}
+
+// Call this function after initialization to ensure resize handle is added
+if (visionVideoContainer) {
+    addResizeHandleToVisionContainer();
+}
+
+// Default front camera (selfie mode)
+let visionFacingMode = 'user';
+
+async function startVisionCamera() {
+    if (!navigator.mediaDevices?.getUserMedia) { alert('Camera API not supported.'); return; }
+    if (!visionVideoPreview || !visionEnableCamBtn || !visionVideoContainer || !visionControls || !visionStatus) return;
+    visionStatus.textContent = 'Requesting camera access...';
+    visionStatus.style.display = 'block'; visionStatus.style.color = '#6c757d';
+    visionEnableCamBtn.disabled = true;
+    
+    try {
+        // First, ensure any existing stream is properly stopped
+        if (visionStream) {
+            visionStream.getTracks().forEach(track => track.stop());
+            visionStream = null;
+        }
+        
+        // On mobile, we need to be specific about the camera we want
+        const constraints = {
+            video: {
+                facingMode: visionFacingMode,
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        };
+        
+        console.log(`Attempting to access camera with facing mode: ${visionFacingMode}`);
+        visionStream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        console.log("Camera stream obtained successfully.");
+        
+        // Update flip button text based on current camera
+        if (visionFlipCamBtn) {
+            visionFlipCamBtn.innerHTML = visionFacingMode === 'user' 
+                ? '<i class="fas fa-sync-alt"></i> Switch to Back Camera'
+                : '<i class="fas fa-sync-alt"></i> Switch to Front Camera';
+        }
+        
+        visionVideoPreview.srcObject = visionStream;
+        visionVideoPreview.onloadedmetadata = () => {
+            visionVideoPreview.play().catch(e => console.error("Video play failed:", e)); 
+            visionEnableCamBtn.style.display = 'none';
+            visionVideoContainer.style.display = 'block';
+            visionControls.style.display = 'block';
+            visionStatus.style.display = 'none';
+            clearVisionResults(); // Clear previous results when starting camera
+            console.log("Camera preview started.");
+        };
+        visionVideoPreview.onerror = (e) => {
+            console.error("Video preview error:", e);
+            visionStatus.textContent = `Video error: ${e.message || 'Unknown'}`;
+            visionStatus.style.color = 'red';
+            stopVisionCamera(); // Stop if video errors out
+        };
+        // Make video preview resize with container
+        visionVideoPreview.style.width = '100%';
+        visionVideoPreview.style.height = '100%';
+    } catch (err) {
+        console.error("Error accessing camera:", err);
+        visionStatus.textContent = `Error accessing camera: ${err.name}. Check permissions.`;
+        visionStatus.style.color = 'red';
+        visionEnableCamBtn.disabled = false;
+    }
+}
+
+function stopVisionCamera() {
+    if (visionStream) {
+        visionStream.getTracks().forEach(track => track.stop());
+        console.log("Camera stream stopped.");
+    }
+    visionStream = null;
+    lastCapturedFrameDataUrl = null;
+    if (visionVideoPreview) visionVideoPreview.srcObject = null;
+    if (visionEnableCamBtn) visionEnableCamBtn.style.display = 'block';
+    if (visionVideoContainer) visionVideoContainer.style.display = 'none';
+    if (visionControls) visionControls.style.display = 'none';
+    if (visionActions) visionActions.style.display = 'none';
+    if (visionStatus) visionStatus.style.display = 'none';
+    if (visionResultsText) visionResultsText.value = '';
+    if (visionEnableCamBtn) visionEnableCamBtn.disabled = false;
+}
+
+async function describeVisionFrame() {
+    if (!visionVideoPreview || !visionStream || !visionDescribeBtn || !visionResultsText || !visionStatus || !visionActions) {
+        console.error("Vision elements missing for description."); return;
+    }
+    if (visionVideoPreview.readyState < visionVideoPreview.HAVE_CURRENT_DATA) { // Check if frame data is available
+        console.warn("Video not ready for capture."); visionStatus.textContent = 'Video not ready...';
+        visionStatus.style.display = 'block'; return;
+    }
+    visionDescribeBtn.disabled = true;
+    visionStatus.textContent = 'Capturing frame...'; visionStatus.style.color = '#6c757d';
+    visionStatus.style.display = 'block';
+    visionResultsText.value = ''; visionActions.style.display = 'none'; // Hide actions during processing
+
+    try {
+        // Create canvas if it doesn't exist
+        if (!visionCanvas) visionCanvas = document.createElement('canvas');
+        const videoWidth = visionVideoPreview.videoWidth;
+        const videoHeight = visionVideoPreview.videoHeight;
+        if (videoWidth === 0 || videoHeight === 0) { throw new Error("Video dimensions are zero."); }
+        visionCanvas.width = videoWidth;
+        visionCanvas.height = videoHeight;
+        const context = visionCanvas.getContext('2d');
+        context.drawImage(visionVideoPreview, 0, 0, videoWidth, videoHeight);
+        // Get frame as JPEG data URL
+        lastCapturedFrameDataUrl = visionCanvas.toDataURL('image/jpeg', 0.9);
+        console.log("Frame captured (JPEG data URL length):", lastCapturedFrameDataUrl.length);
+
+        visionStatus.textContent = 'Asking AI to describe...';
+        if (typeof puter === 'undefined' || !puter.ai?.chat) throw new Error("Puter chat missing.");
+
+        // Use a vision-capable model
+        const visionModelToUse = 'gpt-4o-mini'; // Or 'gpt-4o', 'pixtral-large-latest' etc.
+        console.log(`Sending frame to Vision model: ${visionModelToUse}`);
+
+        // Call puter.ai.chat with prompt and image data URL
+        const response = await puter.ai.chat("Describe this image in detail.", lastCapturedFrameDataUrl, { model: visionModelToUse });
+
+        console.log("Vision response received:", response);
+        let aiText = "Sorry, couldn't get description.";
+        if (response && typeof response === 'string') aiText = response;
+        else if (response?.text) aiText = response.text;
+        else if (response?.message?.content) aiText = response.message.content;
+        else if (response?.error) aiText = `Error: ${response.error.message || response.error}`;
+        else console.warn("Unexpected vision response:", response);
+
+        visionResultsText.value = aiText;
+        visionStatus.style.display = 'none';
+        visionActions.style.display = 'block'; // Show action buttons
+        visionSpeakBtn.disabled = !aiText;
+        visionCopyBtn.disabled = !aiText;
+        visionSaveImgBtn.disabled = false; // Enable save image now that frame is captured
+
+    } catch (error) {
+        console.error("Error describing vision frame:", error);
+        visionStatus.textContent = `Error: ${error.message || 'Unknown error'}`;
+        visionStatus.style.color = 'red';
+        lastCapturedFrameDataUrl = null; // Clear invalid frame data
+        visionSaveImgBtn.disabled = true; // Disable save if error occurred
+    } finally {
+        visionDescribeBtn.disabled = false; // Re-enable describe button
+    }
+}
+
+function clearVisionResults() {
+    if (visionResultsText) visionResultsText.value = '';
+    if (visionActions) visionActions.style.display = 'none';
+    if (visionStatus) visionStatus.style.display = 'none';
+    if (visionSpeakBtn) visionSpeakBtn.disabled = true;
+    if (visionCopyBtn) visionCopyBtn.disabled = true;
+    // Keep save image button enabled if a frame was captured
+    // Don't clear lastCapturedFrameDataUrl here
+}
+
+function saveVisionImage() {
+    if (!lastCapturedFrameDataUrl) { alert("No image captured to save."); return; }
+    saveImageFromDataUrl(lastCapturedFrameDataUrl, `vision_capture_${Date.now()}`);
 }
